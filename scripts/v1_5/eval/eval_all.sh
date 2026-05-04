@@ -1,7 +1,12 @@
 #!/bin/bash
 
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
 
-OUTPUT_DIR_PREFIX="your_path_to_checkpoints/llava-v1.5-7b"
+export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-4,5,6,7}
+
+
+OUTPUT_DIR_PREFIX="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b"
 
 
 
@@ -43,13 +48,13 @@ echo "" >> "$summary_file"
 
 
 
-EVAL_ON_ICONQA=./scripts/v1_5/eval/downstream/eval_gqa.sh/eval_iconqa_txt.sh
+EVAL_ON_ICONQA=./scripts/v1_5/eval/downstream/eval_iconqa_txt.sh
 # EVAL_ON_COCO=./scripts/v1_5/eval/downstream/eval_gqa.sh/eval_coco.sh
 
-EVAL_ON_GQA=./scripts/v1_5/eval/upstream/eval_gqa.sh/eval_gqa.sh
-EVAL_ON_OKVQA=./scripts/v1_5/eval/upstream/eval_gqa.sh/eval_okvqa.sh
-EVAL_ON_OCRVQA=./scripts/v1_5/eval/upstream/eval_gqa.sh/eval_ocrvqa.sh
-EVAL_ON_TEXTVQA=./scripts/v1_5/eval/upstream/eval_gqa.sh/eval_textvqa.sh
+EVAL_ON_GQA=./scripts/v1_5/eval/upstream/eval_gqa.sh
+EVAL_ON_OKVQA=./scripts/v1_5/eval/upstream/eval_okvqa.sh
+EVAL_ON_OCRVQA=./scripts/v1_5/eval/upstream/eval_ocrvqa.sh
+EVAL_ON_TEXTVQA=./scripts/v1_5/eval/upstream/eval_textvqa.sh
 
 
 

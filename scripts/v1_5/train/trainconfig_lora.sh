@@ -14,16 +14,16 @@
 : ${OUTPUT_DIR:=""}
 
 : ${GRADIENT_ACCUMULATION_STEPS:=1}
-: ${MODEL_NAME_OR_PATH:="your_path_to_base_model/llava-v1.5-7b-ft"}
-: ${DEEPSPEED_ZEROFILE:="LoRASculpt/scripts/zero2.json"}
+: ${MODEL_NAME_OR_PATH:="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"}
+: ${DEEPSPEED_ZEROFILE:="./scripts/zero2.json"}
 
 
 if [ "$DATASET_NAME" == "iconqa_txt" ]; then
-    data_path="your_path_to_train_json_scripts/iconqa_txt-train.json"
-    image_folder="your_path_to_image_folder/iconqa"
+    data_path="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/iconqa/iconqa_txt-train.json"
+    image_folder="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/iconqa"
 elif [ "$DATASET_NAME" == "coco" ]; then
-    data_path="your_path_to_train_json_scripts/coco-train.json"
-    image_folder="your_path_to_image_folder/coco"
+    data_path="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/coco-train.json"
+    image_folder="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco"
 else
     echo "Unsupported DATASET_NAME: $DATASET_NAME"
     exit 1
@@ -38,7 +38,7 @@ deepspeed --include $DEVICE --master_port $MASTER_PORT llava/train/train_mem.py 
     --version v1 \
     --data_path $data_path \
     --image_folder $image_folder \
-    --vision_tower your_path_to_vision_tower/clip-vit-large-patch14-336 \
+    --vision_tower /data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/clip-vit-large-patch14-336 \
     --mm_projector_type mlp2x_gelu \
     --mm_vision_select_layer -2 \
     --mm_use_im_start_end False \

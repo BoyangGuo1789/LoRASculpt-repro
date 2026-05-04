@@ -21,6 +21,8 @@ dist
 .DS_Store
 wandb
 output
+*.bak_repro
+your_data
 
 checkpoints
 ckpts*

@@ -7,7 +7,7 @@ CHUNKS=${#GPULIST[@]}
 
 
 MODEL_PATH=""
-MODEL_BASE="your_path_to_base_model/llava-v1.5-7b-ft"
+MODEL_BASE="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"
 CKPT="llava-v1.5-7b"
 SPLIT="ocrvqa"
 RESULT_DIR=""
@@ -41,8 +41,8 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.model_vqa_loader \
         --model-path $MODEL_PATH \
         --model-base $MODEL_BASE \
-        --question-file your_data/ocrvqa/sampled_ocrvqa_test.jsonl \
-        --image-folder your_data/ocrvqa/sampled_images \
+        --question-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/ocrvqa/sampled_ocrvqa_test.jsonl \
+        --image-folder /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/ocrvqa/sampled_images \
         --answers-file $RESULT_DIR/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
@@ -70,7 +70,7 @@ done
 
 
 python -m llava.eval.eval_ocrvqa \
-    --annotation-file your_data/ocrvqa/sampled_ocrvqa_test.jsonl \
+    --annotation-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/ocrvqa/sampled_ocrvqa_test.jsonl \
     --result-file $output_file \
     --output-dir $RESULT_DIR/$SPLIT/$CKPT \
     --summary-output-dir $SUMMARY_OUTPUT_DIR

@@ -6,7 +6,7 @@ IFS=',' read -ra GPULIST <<< "$gpu_list"
 CHUNKS=${#GPULIST[@]}
 
 MODEL_PATH=""
-MODEL_BASE="your_path_to_base_model/llava-v1.5-7b-ft"
+MODEL_BASE="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"
 CKPT="llava-v1.5-7b"
 SPLIT="okvqa"
 RESULT_DIR=""
@@ -37,8 +37,8 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.model_vqa_loader \
         --model-path $MODEL_PATH \
         --model-base $MODEL_BASE \
-        --question-file your_data/okvqa/okvqa_val.jsonl \
-        --image-folder your_data/okvqa/val2014 \
+        --question-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/okvqa/okvqa_val.jsonl \
+        --image-folder /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/okvqa/val2014 \
         --answers-file $RESULT_DIR/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
@@ -63,8 +63,8 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
 done
 
 python -m llava.eval.eval_okvqa \
-    --annotation-file your_data/okvqa/mscoco_val2014_annotations.json \
-    --question-file your_data/okvqa/OpenEnded_mscoco_val2014_questions.json \
+    --annotation-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/okvqa/mscoco_val2014_annotations.json \
+    --question-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/okvqa/OpenEnded_mscoco_val2014_questions.json \
     --result-file $output_file \
     --output-dir $RESULT_DIR/$SPLIT/$CKPT \
     --summary-output-dir $SUMMARY_OUTPUT_DIR

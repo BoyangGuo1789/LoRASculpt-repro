@@ -7,11 +7,11 @@ CHUNKS=${#GPULIST[@]}
 
 
 MODEL_PATH=""
-MODEL_BASE="your_path_to_base_model/llava-v1.5-7b-ft"
+MODEL_BASE="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"
 CKPT="llava-v1.5-7b"
 SPLIT="gqa"
 RESULT_DIR=""
-GQADIR="your_data/gqa/data"
+GQADIR="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/gqa/data"
 
 
 if [ ! -n "$1" ] ;then
@@ -39,8 +39,8 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.model_vqa_loader \
         --model-path $MODEL_PATH \
         --model-base $MODEL_BASE \
-        --question-file your_data/gqa/llava_gqa_testdev_balanced.jsonl \
-        --image-folder your_data/gqa/data/images \
+        --question-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/gqa/llava_gqa_testdev_balanced.jsonl \
+        --image-folder /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/gqa/data/images \
         --answers-file $RESULT_DIR/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
@@ -67,8 +67,8 @@ done
 
 python scripts/convert_gqa_for_eval.py --src $output_file --dst $GQADIR/testdev_balanced_predictions.json
 
-cd $GQADIR
-python eval/1_eval.py \
-    --tier testdev_balanced \
+python -m llava.eval.eval_gqa_simple \
+    --annotation-file $GQADIR/testdev_balanced_questions.json \
+    --result-file $output_file \
     --output-dir $RESULT_DIR/$SPLIT/$CKPT \
     --summary-output-dir $SUMMARY_OUTPUT_DIR

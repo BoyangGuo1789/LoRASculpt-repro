@@ -791,23 +791,35 @@ class LoRASculpt(LLaVATrainer):
         reg_loss = 0.0
         param_count = 0
 
+        def normalize_lora_key(name):
+            if name.startswith("module."):
+                name = name[len("module."):]
+            return (name
+                    .replace(".lora_A.default.weight", ".weight")
+                    .replace(".lora_B.default.weight", ".weight")
+                    .replace(".base_layer.weight", ".weight"))
+
         dict_A={}
         dict_B={}
         dict_PT={}
+        target_projs = ("q_proj", "k_proj", "v_proj", "mm_projector")
         for name, param in model.named_parameters():
-            if "lora_A" in name and any(proj in name for proj in ("q_proj", "k_proj", "v_proj", "mm_projector")):
-                dict_A[name] = param
-            elif "lora_B" in name and any(proj in name for proj in ("q_proj", "k_proj", "v_proj", "mm_projector")):
-                dict_B[name] = param
-            elif "base_layer" in name and any(proj in name for proj in ("q_proj", "k_proj", "v_proj", "mm_projector")):
-                dict_PT[name] = param
+            if not any(proj in name for proj in target_projs):
+                continue
+            key = normalize_lora_key(name)
+            if "lora_A" in name:
+                dict_A[key] = param
+            elif "lora_B" in name:
+                dict_B[key] = param
+            elif "base_layer" in name or key.endswith(".weight"):
+                dict_PT.setdefault(key, param)
 
         
-        for lora_A_name, A in dict_A.items():
-            lora_B_name = lora_A_name.replace("lora_A", "lora_B")
-            PT_name = lora_A_name.replace("lora_A.default", "base_layer")
-            B = dict_B[lora_B_name]
-            W = dict_PT[PT_name]
+        for key, A in dict_A.items():
+            B = dict_B.get(key)
+            W = dict_PT.get(key)
+            if B is None or W is None:
+                continue
             
             
             with torch.no_grad():
@@ -819,7 +831,8 @@ class LoRASculpt(LLaVATrainer):
             reg_loss += torch.norm(M * (B @ A), p=2)   
             param_count += 1
 
-
+        if param_count == 0:
+            return torch.zeros((), device=next(model.parameters()).device)
         reg_loss = reg_lambda * reg_loss / param_count
 
         return reg_loss

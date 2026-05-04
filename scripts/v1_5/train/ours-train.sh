@@ -1,8 +1,11 @@
 #!/bin/bash
 
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
 
-export DEVICE=localhost:0,1,2,3
-OUTPUT_DIR_PREFIX="your_path_to_checkpoints/llava-v1.5-7b"
+
+export DEVICE=localhost:4,5,6,7
+OUTPUT_DIR_PREFIX="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b"
 
 
 export PER_DEVICE_TRAIN_BATCH_SIZE=4
