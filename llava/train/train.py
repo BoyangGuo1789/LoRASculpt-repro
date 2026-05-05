@@ -56,6 +56,7 @@ class ModelArguments:
     version: Optional[str] = field(default="v0")
     freeze_backbone: bool = field(default=False)
     tune_mm_mlp_adapter: bool = field(default=False)
+    tune_decoder_layer: Optional[int] = field(default=0)  # SPIDER: tune the last N LLM decoder layers with mm_projector.
     vision_tower: Optional[str] = field(default=None)
     mm_vision_select_layer: Optional[int] = field(default=-1)   # default to the last layer
     pretrain_mm_mlp_adapter: Optional[str] = field(default=None)
@@ -112,6 +113,12 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_bias: str = "none"
     mm_projector_lr: Optional[float] = None
     group_by_modality_length: bool = field(default=False)
+    ids_enable: bool = field(default=False)
+    ids_grad_lambda: float = field(default=1.0)
+    ids_ret_lambda: float = field(default=0.5)
+    ids_grad_ema_beta: float = field(default=0.9)
+    ids_apply_retention_to: str = field(default="qkv")
+    ids_score_eps: float = field(default=1e-8)
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
@@ -206,7 +213,10 @@ def safe_save_model_for_hf_trainer(trainer: transformers.Trainer,
                 torch.save(weight_to_save, os.path.join(mm_projector_folder, f'{current_folder}.bin'))
             else:
                 torch.save(weight_to_save, os.path.join(output_dir, f'mm_projector.bin'))
-        return
+        if getattr(trainer.args, "tune_decoder_layer", 0):
+            rank0_print("tune_decoder_layer is enabled; saving full trainable model through Trainer.")
+        else:
+            return
 
     if trainer.deepspeed:
         torch.cuda.synchronize()
@@ -929,6 +939,11 @@ def train(attn_implementation=None):
         if model_args.tune_mm_mlp_adapter:
             model.requires_grad_(False)
             for p in model.get_model().mm_projector.parameters():
+                p.requires_grad = True
+
+        model.config.tune_decoder_layer = training_args.tune_decoder_layer = model_args.tune_decoder_layer
+        if model_args.tune_decoder_layer > 0:
+            for p in model.get_model().layers[-model_args.tune_decoder_layer:].parameters():
                 p.requires_grad = True
 
         model.config.freeze_mm_mlp_adapter = training_args.freeze_mm_mlp_adapter

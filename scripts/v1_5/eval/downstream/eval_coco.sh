@@ -7,7 +7,7 @@ CHUNKS=${#GPULIST[@]}
 
 
 MODEL_PATH=""
-MODEL_BASE="your_path_to_base_model/llava-v1.5-7b-ft"
+MODEL_BASE="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"
 CKPT="llava-v1.5-7b"
 SPLIT="coco"
 RESULT_DIR=""
@@ -41,8 +41,8 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.model_caption_loader \
         --model-path $MODEL_PATH \
         --model-base $MODEL_BASE \
-        --question-file your_data/coco/llava_caption_mscoco_test.jsonl \
-        --image-folder your_data/coco/val2014 \
+        --question-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/llava_caption_mscoco_test.jsonl \
+        --image-folder /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/val2014 \
         --answers-file $RESULT_DIR/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
@@ -71,7 +71,7 @@ done
 
 
 python -m llava.eval.eval_caption \
-    --annotation-file your_data/coco/captions_test5k.json \
+    --annotation-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/captions_test5k.json \
     --result-file $output_file \
     --output-dir $RESULT_DIR/$SPLIT/$CKPT \
     --summary-output-dir $SUMMARY_OUTPUT_DIR

@@ -26,6 +26,22 @@ your_data
 
 checkpoints
 ckpts*
+data/
+models/
+downloads/
+logs/
+repro_results/
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.npy
+*.npz
+*.pkl
+*.pickle
+!scripts/zero2.json
 
 .ipynb_checkpoints
 *.ipynb

@@ -29,6 +29,17 @@ else
     exit 1
 fi
 
+if [ -n "${DATA_PATH_OVERRIDE:-}" ]; then
+    data_path="$DATA_PATH_OVERRIDE"
+fi
+
+if [ -n "${IMAGE_FOLDER_OVERRIDE:-}" ]; then
+    image_folder="$IMAGE_FOLDER_OVERRIDE"
+fi
+
+echo "Training data_path: $data_path"
+echo "Training image_folder: $image_folder"
+
 
 
 deepspeed --include $DEVICE --master_port $MASTER_PORT llava/train/train_mem.py \
