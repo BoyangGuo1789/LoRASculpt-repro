@@ -119,6 +119,18 @@ class TrainingArguments(transformers.TrainingArguments):
     ids_grad_ema_beta: float = field(default=0.9)
     ids_apply_retention_to: str = field(default="qkv")
     ids_score_eps: float = field(default=1e-8)
+    migdis_enable: bool = field(default=False)
+    migdis_grad_ema_beta: float = field(default=0.95)
+    migdis_grad_mix: float = field(default=0.50)
+    migdis_source_margin: float = field(default=0.35)
+    migdis_source_scope: str = field(default="qkv")
+    migdis_norm: str = field(default="robust")
+    migdis_norm_q_low: float = field(default=0.05)
+    migdis_norm_q_high: float = field(default=0.95)
+    migdis_eps: float = field(default=1e-6)
+    migdis_source_chunk_rows: int = field(default=2048)
+    migdis_final_gamma: float = field(default=1.0)
+    migdis_debug_dump: bool = field(default=True)
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
