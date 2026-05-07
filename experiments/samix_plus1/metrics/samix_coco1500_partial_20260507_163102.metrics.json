@@ -1,0 +1,24 @@
+{
+  "run_name": "samix_coco1500_partial_20260507_163102",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-samix-coco1500-iconqa-r32",
+  "tasks_completed": [
+    "iconqa",
+    "okvqa",
+    "ocrvqa",
+    "textvqa"
+  ],
+  "metrics": {
+    "IconQA": 84.96,
+    "OKVQA": 50.17,
+    "OCRVQA": 57.1,
+    "GQA": null,
+    "TextVQA": 51.41,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": 69.90999999999997,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "2f07e40464cebcea09991897ccdebb62a4a4de09",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/lorasculpt_samix_coco1500_partial_eval_20260507_163102.log"
+}
