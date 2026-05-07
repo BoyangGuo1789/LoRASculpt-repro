@@ -37,7 +37,9 @@ gpu_list="${CUDA_VISIBLE_DEVICES:-0,1,2,3}"
 IFS=',' read -ra GPULIST <<< "$gpu_list"
 CHUNKS=${#GPULIST[@]}
 
-exec > >(tee -a "${LOG_FILE:-/dev/stdout}") 2>&1
+if [ -n "$LOG_FILE" ]; then
+  echo "[eval_selected] log_file=$LOG_FILE"
+fi
 
 echo "Model: $CHECKPOINT" > "$SUMMARY"
 echo "Official JSON root: $OFFICIAL_JSON_ROOT" >> "$SUMMARY"
