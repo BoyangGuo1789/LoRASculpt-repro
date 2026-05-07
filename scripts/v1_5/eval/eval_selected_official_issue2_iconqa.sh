@@ -23,6 +23,7 @@ done
 : "${PYTHON_BIN:=/data/guoboyang/miniconda3/envs/lorasculpt/bin/python}"
 : "${OFFICIAL_JSON_ROOT:=$ROOT/downloads/official_issue2/extracted/LoRASculpt_JSON_files}"
 : "${OUTPUT_ROOT:=$ROOT/repro_results/mbldf_plus1}"
+: "${EARLY_STOP_OCRVQA_MIN:=}"
 
 if [ -z "$CHECKPOINT" ] || [ -z "$RUN_NAME" ]; then
   echo "Usage: $0 --checkpoint CKPT --run-name RUN [--tasks iconqa,okvqa,ocrvqa,textvqa] [--output-root DIR] [--log-file FILE]" >&2
@@ -105,6 +106,55 @@ if has_task ocrvqa; then
     --result-file "$OUTPUT_ROOT/$RUN_NAME/ocrvqa/$CKPT_NAME/answers.jsonl" \
     --output-dir "$OUTPUT_ROOT/$RUN_NAME/ocrvqa/$CKPT_NAME" \
     --summary-output-dir "$SUMMARY"
+  if [ -n "$EARLY_STOP_OCRVQA_MIN" ]; then
+    EARLY_STOP_MARKER="$OUTPUT_ROOT/$RUN_NAME/.early_stop"
+    rm -f "$EARLY_STOP_MARKER"
+    "$PYTHON_BIN" - "$RUN_NAME" "$CHECKPOINT" "$TASKS" "$SUMMARY" "$METRICS" "$LOG_FILE" "$EARLY_STOP_OCRVQA_MIN" "$EARLY_STOP_MARKER" <<'PY'
+import json, re, subprocess, sys
+run_name, ckpt, tasks, summary, metrics_path, log_file, min_ocr, marker = sys.argv[1:9]
+text = open(summary).read()
+patterns = {
+    "IconQA": r"Accuracy on IconQA:\s*([0-9.]+)%",
+    "OKVQA": r"Accuracy on OKVQA:\s*([0-9.]+)%",
+    "OCRVQA": r"Accuracy on OCRVQA:\s*([0-9.]+)%",
+    "GQA": r"Accuracy on GQA:\s*([0-9.]+)%",
+    "TextVQA": r"Accuracy on TextVQA:\s*([0-9.]+)%",
+}
+vals = {}
+for key, pat in patterns.items():
+    m = re.search(pat, text)
+    vals[key] = float(m.group(1)) if m else None
+ocr = vals.get("OCRVQA")
+threshold = float(min_ocr)
+if ocr is None or ocr >= threshold:
+    raise SystemExit(0)
+try:
+    commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+except Exception:
+    commit = ""
+out = {
+    "run_name": run_name,
+    "checkpoint": ckpt,
+    "tasks_completed": [k.lower() for k in ["IconQA", "OKVQA", "OCRVQA"] if vals[k] is not None],
+    "metrics": {**vals, "SourceAvg": None, "Avg": None},
+    "required_gqa_for_target": None,
+    "target_avg": 71.05375,
+    "promote_to_full_eval": False,
+    "early_stop": True,
+    "stop_reason": f"ocrvqa_gate_fail_lt_{threshold:.2f}",
+    "git_commit": commit,
+    "log_file": log_file,
+}
+with open(metrics_path, "w") as f:
+    json.dump(out, f, indent=2)
+with open(marker, "w") as f:
+    f.write(out["stop_reason"] + "\n")
+print(json.dumps(out, indent=2))
+PY
+    if [ -f "$EARLY_STOP_MARKER" ]; then
+      exit 0
+    fi
+  fi
 fi
 
 if has_task gqa; then

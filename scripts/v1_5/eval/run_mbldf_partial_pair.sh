@@ -8,6 +8,7 @@ set -euo pipefail
 : "${LOGS:=$ROOT/logs}"
 : "${PYTHON_BIN:=/data/guoboyang/miniconda3/envs/lorasculpt/bin/python}"
 : "${TASKS:=iconqa,okvqa,ocrvqa,textvqa}"
+: "${EARLY_STOP_OCRVQA_MIN:=55.50}"
 
 SCRIPT_PATH="$(readlink -f "$0")"
 
@@ -26,6 +27,7 @@ if [ "${1:-}" = "--child" ]; then
   cd "$REPO"
   export CUDA_VISIBLE_DEVICES="$GPUS"
   export PYTHON_BIN
+  export EARLY_STOP_OCRVQA_MIN
   exec bash scripts/v1_5/eval/eval_selected_official_issue2_iconqa.sh \
     --checkpoint "$CHECKPOINT" \
     --run-name "$RUN_NAME" \
@@ -48,7 +50,7 @@ launch_one() {
   ts="$(date +%Y%m%d_%H%M%S)"
   log_file="$LOGS/${run_name}_partial_eval_${ts}.log"
   ROOT="$ROOT" REPO="$REPO" CKPTS="$CKPTS" RESULTS="$RESULTS" LOGS="$LOGS" \
-    PYTHON_BIN="$PYTHON_BIN" TASKS="$TASKS" \
+    PYTHON_BIN="$PYTHON_BIN" TASKS="$TASKS" EARLY_STOP_OCRVQA_MIN="$EARLY_STOP_OCRVQA_MIN" \
     nohup bash "$SCRIPT_PATH" --child "$run_name" "$gpus" "$log_file" >/dev/null 2>&1 &
   pid=$!
   echo "$run_name $pid $gpus $log_file"
