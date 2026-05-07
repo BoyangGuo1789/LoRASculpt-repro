@@ -1,0 +1,24 @@
+{
+  "run_name": "samix1500_mlp_mid_l005_partial_20260507_180256",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-samixdelta-samix1500_mlp_mid_l005",
+  "tasks_completed": [
+    "iconqa",
+    "okvqa",
+    "ocrvqa",
+    "textvqa"
+  ],
+  "metrics": {
+    "IconQA": 86.27,
+    "OKVQA": 52.72,
+    "OCRVQA": 54.7,
+    "GQA": null,
+    "TextVQA": 51.74,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": 64.18999999999997,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "fb306abaa75cfd58e36e60ade2868510dc16fab7",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/lorasculpt_samix1500_mlp_mid_l005_partial_20260507_180256.log"
+}
