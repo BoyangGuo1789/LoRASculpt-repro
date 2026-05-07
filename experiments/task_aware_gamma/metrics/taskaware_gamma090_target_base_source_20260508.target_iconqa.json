@@ -1,0 +1,21 @@
+{
+  "run_name": "taskgate_gamma090_iconqa_20260508_0509",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-iconqa_txt_official_issue2-LoRASculpt-lora-r32-a64-e3-CMRLAMBDA1e-3-OMEGA1.0-RATIO0.1-gamma090",
+  "tasks_completed": [
+    "iconqa"
+  ],
+  "metrics": {
+    "IconQA": 86.29,
+    "OKVQA": null,
+    "OCRVQA": null,
+    "GQA": null,
+    "TextVQA": null,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "25e3973d570485ee9370b6c382de3fdb833607c0",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/taskgate_gamma090_iconqa_20260508_0509.log"
+}

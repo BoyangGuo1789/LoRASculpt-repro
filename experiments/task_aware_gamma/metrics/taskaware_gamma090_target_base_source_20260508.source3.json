@@ -1,0 +1,23 @@
+{
+  "run_name": "taskgate_base_source3_20260508_0427",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft",
+  "tasks_completed": [
+    "okvqa",
+    "ocrvqa",
+    "textvqa"
+  ],
+  "metrics": {
+    "IconQA": null,
+    "OKVQA": 57.99,
+    "OCRVQA": 66.15,
+    "GQA": null,
+    "TextVQA": 58.23,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "25e3973d570485ee9370b6c382de3fdb833607c0",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/taskgate_base_source3_20260508_0427.log"
+}

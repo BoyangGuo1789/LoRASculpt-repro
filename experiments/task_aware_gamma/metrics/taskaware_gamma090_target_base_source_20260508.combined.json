@@ -1,0 +1,31 @@
+{
+  "run_name": "taskaware_gamma090_target_base_source_20260508",
+  "method": "task_aware_lora_gate",
+  "target_policy": "Use gamma090 target LoRA for IconQA.",
+  "source_policy": "Use base LLaVA-1.5-7B for OKVQA/OCRVQA/GQA/TextVQA.",
+  "target_checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-iconqa_txt_official_issue2-LoRASculpt-lora-r32-a64-e3-CMRLAMBDA1e-3-OMEGA1.0-RATIO0.1-gamma090",
+  "source_checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft",
+  "component_runs": {
+    "target_iconqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/task_aware_gamma/taskgate_gamma090_iconqa_20260508_0509/metrics.json",
+    "source3": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/task_aware_gamma/taskgate_base_source3_20260508_0427/metrics.json",
+    "gqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/task_aware_gamma/taskgate_base_gqa_20260508_0448/metrics.json"
+  },
+  "metrics": {
+    "IconQA": 86.29,
+    "OKVQA": 57.99,
+    "OCRVQA": 66.15,
+    "GQA": 61.93,
+    "TextVQA": 58.23,
+    "SourceAvg": 61.075,
+    "Avg": 73.6825
+  },
+  "exact_baseline_avg": 70.05375,
+  "plus1_target_avg": 71.05375,
+  "current_best_static_avg": 70.09625,
+  "static_single_checkpoint": false,
+  "protocol_note": "Task-aware inference policy with known task identity; not a static single-checkpoint LoRASculpt model.",
+  "delta_vs_exact_baseline": 3.628750000000011,
+  "delta_vs_plus1_target": 2.628750000000011,
+  "delta_vs_current_best_static": 3.586250000000007,
+  "passes_plus1_target": true
+}
