@@ -1,0 +1,47 @@
+{
+  "default": {
+    "mask_mode": "copy_base",
+    "gamma_base": 1.0
+  },
+  "candidates": [
+    {
+      "name": "tpsrc_all_l002",
+      "description": "Baseline-anchored dense-delta blend with 2% of the source-moving TP-SA-MIX adapter across all LoRA modules.",
+      "gamma_base": 1.0,
+      "rules": [
+        {
+          "basis": "tpsrc",
+          "module_groups": ["q", "k", "v", "o", "mlp"],
+          "bands": ["early", "mid", "late"],
+          "lambda": 0.02
+        }
+      ]
+    },
+    {
+      "name": "tpsrc_all_l005",
+      "description": "Baseline-anchored dense-delta blend with 5% of the source-moving TP-SA-MIX adapter across all LoRA modules.",
+      "gamma_base": 1.0,
+      "rules": [
+        {
+          "basis": "tpsrc",
+          "module_groups": ["q", "k", "v", "o", "mlp"],
+          "bands": ["early", "mid", "late"],
+          "lambda": 0.05
+        }
+      ]
+    },
+    {
+      "name": "tpkd_all_l002",
+      "description": "Baseline-anchored dense-delta blend with 2% of the KD-safe TP-SA-MIX adapter across all LoRA modules.",
+      "gamma_base": 1.0,
+      "rules": [
+        {
+          "basis": "tpkd",
+          "module_groups": ["q", "k", "v", "o", "mlp"],
+          "bands": ["early", "mid", "late"],
+          "lambda": 0.02
+        }
+      ]
+    }
+  ]
+}
