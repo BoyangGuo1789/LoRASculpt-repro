@@ -1,0 +1,36 @@
+{
+  "candidate_name": "samix3000_v_mid_l005",
+  "description": "Low-risk SA-MIX 3000 TextVQA delta into early/mid v_proj only.",
+  "base_ckpt": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-iconqa_txt_official_issue2-LoRASculpt-lora-r32-a64-e3-CMRLAMBDA1e-3-OMEGA1.0-RATIO0.1",
+  "output_dir": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-samixdelta-samix3000_v_mid_l005",
+  "basis_ckpts": {
+    "samix1500": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-samix-coco1500-iconqa-r32",
+    "samix3000": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-samix-coco3000-iconqa-r32",
+    "base": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-iconqa_txt_official_issue2-LoRASculpt-lora-r32-a64-e3-CMRLAMBDA1e-3-OMEGA1.0-RATIO0.1"
+  },
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "samix3000",
+      "module_groups": [
+        "v"
+      ],
+      "bands": [
+        "early",
+        "mid"
+      ],
+      "lambda": 0.05
+    }
+  ],
+  "rank": 32,
+  "alpha": 64,
+  "target_scaling": 2.0,
+  "mask_mode": "copy_base",
+  "num_lora_modules": 224,
+  "num_mask_buffers_seen": 0,
+  "mean_retained_energy": 0.9992647249316612,
+  "min_retained_energy": 0.9852624289248954,
+  "num_nan_or_inf_tensors": 0,
+  "source_git_commit": "e6741f1181bd104dd45fba923c4bd60534ae8628",
+  "created_at": "2026-05-07T09:31:16.190425+00:00"
+}
