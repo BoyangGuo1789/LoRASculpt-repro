@@ -135,11 +135,29 @@ class TPSAMIX(LoRASculpt):
         weights = weights * active.to(weights.dtype)
         return (sample_loss * weights).sum() / weights.sum().clamp_min(1.0)
 
+    def _masked_ce_loss(self, logits, labels, sample_mask: Optional[torch.Tensor], weight: float = 1.0):
+        shift_logits = logits[..., :-1, :].contiguous()
+        shift_labels = labels[..., 1:].contiguous()
+        vocab_size = shift_logits.size(-1)
+        token_loss = F.cross_entropy(
+            shift_logits.view(-1, vocab_size).float(),
+            shift_labels.view(-1),
+            ignore_index=IGNORE_INDEX,
+            reduction="none",
+        ).view_as(shift_labels)
+
+        token_mask = shift_labels.ne(IGNORE_INDEX)
+        if sample_mask is not None:
+            token_mask = token_mask & sample_mask[:, None].bool()
+        if not token_mask.any():
+            return logits.sum() * 0.0
+        return float(weight) * token_loss[token_mask].mean()
+
     def _topk_kl_loss(self, student_logits, teacher_logits, labels, sample_mask: torch.Tensor, temperature: float, topk: int):
         shift_labels = labels[..., 1:].contiguous()
         token_mask = shift_labels.ne(IGNORE_INDEX) & sample_mask[:, None].bool()
         if not token_mask.any():
-            return torch.zeros((), device=student_logits.device)
+            return student_logits.sum() * 0.0
 
         student = student_logits[..., :-1, :][token_mask].float()
         teacher = teacher_logits[..., :-1, :][token_mask].float()
@@ -170,17 +188,100 @@ class TPSAMIX(LoRASculpt):
         finally:
             core_model.set_adapter("default")
 
+    def _pcgrad_parameters(self, model):
+        return [
+            param
+            for name, param in self._unwrap_model(model).named_parameters()
+            if param.requires_grad and ".teacher." not in name
+        ]
+
+    def _pcgrad_surrogate_loss(self, model, target_loss, source_loss):
+        params = self._pcgrad_parameters(model)
+        if not params:
+            raise ValueError("TP-SA-MIX PCGrad found no trainable parameters")
+
+        target_grads = torch.autograd.grad(
+            target_loss,
+            params,
+            retain_graph=True,
+            allow_unused=True,
+        )
+        source_grads = torch.autograd.grad(
+            source_loss,
+            params,
+            retain_graph=True,
+            allow_unused=True,
+        )
+
+        dot = torch.zeros((), device=target_loss.device)
+        target_norm_sq = torch.zeros((), device=target_loss.device)
+        for target_grad, source_grad in zip(target_grads, source_grads):
+            if target_grad is None or source_grad is None:
+                continue
+            dot = dot + (target_grad.float() * source_grad.float()).sum()
+            target_norm_sq = target_norm_sq + target_grad.float().pow(2).sum()
+
+        coeff = torch.where(
+            dot < 0,
+            dot / target_norm_sq.clamp_min(1e-12),
+            torch.zeros_like(dot),
+        )
+        surrogate = torch.zeros((), device=target_loss.device)
+        for param, target_grad, source_grad in zip(params, target_grads, source_grads):
+            if target_grad is None and source_grad is None:
+                continue
+            if target_grad is None:
+                combined = source_grad
+            elif source_grad is None:
+                combined = target_grad
+            else:
+                combined = target_grad + source_grad - coeff.to(source_grad.device) * target_grad
+            surrogate = surrogate + (param.float() * combined.detach().float()).sum()
+        return surrogate
+
+    def _pcgrad_compute_loss(self, model, inputs, is_source, expanded_labels, outputs):
+        source_weight = float(getattr(self.args, "tp_samix_source_weight", 1.0) or 1.0)
+        target_mask = ~is_source.bool()
+        source_mask = is_source.bool()
+
+        target_loss = self._masked_ce_loss(outputs.logits, expanded_labels, target_mask, weight=1.0)
+        source_loss = self._masked_ce_loss(outputs.logits, expanded_labels, source_mask, weight=source_weight)
+
+        lambda_target_kl = float(getattr(self.args, "tp_samix_lambda_target_kl", 0.0) or 0.0)
+        lambda_source_kl = float(getattr(self.args, "tp_samix_lambda_source_kl", 0.0) or 0.0)
+        if lambda_target_kl > 0.0 or lambda_source_kl > 0.0:
+            teacher_logits = self._teacher_logits(model, inputs)
+            temperature = float(getattr(self.args, "tp_samix_kl_temperature", 2.0) or 2.0)
+            topk = int(getattr(self.args, "tp_samix_kl_topk", 64) or 64)
+            if lambda_target_kl > 0.0:
+                target_loss = target_loss + lambda_target_kl * self._topk_kl_loss(
+                    outputs.logits, teacher_logits, expanded_labels, target_mask, temperature, topk
+                )
+            if lambda_source_kl > 0.0:
+                source_loss = source_loss + lambda_source_kl * self._topk_kl_loss(
+                    outputs.logits, teacher_logits, expanded_labels, source_mask, temperature, topk
+                )
+
+        l2_loss = self._lora_l2_anchor_loss(model)
+        actual_loss = target_loss + source_loss + l2_loss
+
+        grad_loss = self._pcgrad_surrogate_loss(model, target_loss, source_loss) + l2_loss
+        return actual_loss.detach() + (grad_loss - grad_loss.detach())
+
     def compute_loss(self, model, inputs, return_outputs=False):
         is_source = inputs.pop("samix_is_source", None)
         if is_source is not None:
             is_source = is_source.to(model.device) if hasattr(model, "device") else is_source
 
-        if getattr(self.args, "tp_samix_use_pcgrad", False):
-            raise NotImplementedError("TP-SA-MIX PCGrad is reserved for the next version after KD smoke passes")
-
         labels = inputs["labels"]
         outputs = model(**inputs)
         expanded_labels = self._expand_labels_for_logits(model, inputs, labels, outputs.logits)
+        if getattr(self.args, "tp_samix_use_pcgrad", False):
+            if is_source is None:
+                raise ValueError("TP-SA-MIX PCGrad requires samix_is_source batch tags")
+            loss = self._pcgrad_compute_loss(model, inputs, is_source, expanded_labels, outputs)
+            return (loss, outputs) if return_outputs else loss
+
         loss = self._weighted_ce_loss(outputs.logits, expanded_labels, is_source)
 
         lambda_target_kl = float(getattr(self.args, "tp_samix_lambda_target_kl", 0.0) or 0.0)
