@@ -1,0 +1,18 @@
+{
+  "name": "dqss_qk_late_l015",
+  "description": "Inject DQSS target/reasoning vector into late q/k only.",
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "dqss",
+      "module_groups": [
+        "q",
+        "k"
+      ],
+      "bands": [
+        "late"
+      ],
+      "lambda": 0.15
+    }
+  ]
+}
