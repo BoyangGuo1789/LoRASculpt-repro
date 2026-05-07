@@ -1,0 +1,53 @@
+{
+  "target_avg": 71.05375,
+  "exact_baseline_avg": 70.05375,
+  "current_best_avg": 70.09625,
+  "default": {
+    "gamma_base": 1.0,
+    "rank": 32,
+    "alpha": 64,
+    "mask_mode": "copy_base"
+  },
+  "candidates": [
+    {
+      "name": "okvqa_v_mid_l002",
+      "description": "Very small OKVQA source adapter injection into early/mid v_proj.",
+      "gamma_base": 1.0,
+      "rules": [
+        {"basis": "okvqa", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.02}
+      ]
+    },
+    {
+      "name": "okvqa_qv_mid_l002",
+      "description": "Very small OKVQA source adapter injection into early/mid q_proj/v_proj.",
+      "gamma_base": 1.0,
+      "rules": [
+        {"basis": "okvqa", "module_groups": ["q", "v"], "bands": ["early", "mid"], "lambda": 0.02}
+      ]
+    },
+    {
+      "name": "okvqa_v_mid_l005",
+      "description": "Small OKVQA source adapter injection into early/mid v_proj.",
+      "gamma_base": 1.0,
+      "rules": [
+        {"basis": "okvqa", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.05}
+      ]
+    },
+    {
+      "name": "okvqa_qv_mid_l005",
+      "description": "Small OKVQA source adapter injection into early/mid q_proj/v_proj.",
+      "gamma_base": 1.0,
+      "rules": [
+        {"basis": "okvqa", "module_groups": ["q", "v"], "bands": ["early", "mid"], "lambda": 0.05}
+      ]
+    },
+    {
+      "name": "okvqa_qkvo_mid_l002",
+      "description": "Very small OKVQA source adapter injection into early/mid attention projections.",
+      "gamma_base": 1.0,
+      "rules": [
+        {"basis": "okvqa", "module_groups": ["q", "k", "v", "o"], "bands": ["early", "mid"], "lambda": 0.02}
+      ]
+    }
+  ]
+}
