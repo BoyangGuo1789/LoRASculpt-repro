@@ -1,0 +1,1 @@
+date,git_commit,run_name,baseline_lora,coco_n,epochs,lr,source_weight,lambda_target_kl,lambda_source_kl,lambda_l2,kl_temperature,use_pcgrad,eval_gamma,iconqa,okvqa,ocrvqa,gqa,textvqa,source_avg,avg,delta,required_gqa_after_partial,partial_gate,full_eval,notes

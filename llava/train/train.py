@@ -143,6 +143,15 @@ class TrainingArguments(transformers.TrainingArguments):
     migdis_dqss_anti_collapse: bool = field(default=True)
     migdis_dqss_max_aux_overlap: float = field(default=0.98)
     migdis_dqss_min_core_overlap: float = field(default=0.70)
+    lora_start_path: Optional[str] = field(default=None)
+    tp_samix_teacher_lora_path: Optional[str] = field(default=None)
+    tp_samix_source_weight: float = field(default=1.0)
+    tp_samix_lambda_target_kl: float = field(default=0.0)
+    tp_samix_lambda_source_kl: float = field(default=0.0)
+    tp_samix_lambda_l2: float = field(default=0.0)
+    tp_samix_kl_temperature: float = field(default=2.0)
+    tp_samix_kl_topk: int = field(default=64)
+    tp_samix_use_pcgrad: bool = field(default=False)
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
@@ -772,6 +781,8 @@ class LazySupervisedDataset(Dataset):
             # image does not exist in the data, but the model is multimodal
             crop_size = self.data_args.image_processor.crop_size
             data_dict['image'] = torch.zeros(3, crop_size['height'], crop_size['width'])
+        if 'samix_source' in self.list_data_dict[i]:
+            data_dict['samix_is_source'] = int(self.list_data_dict[i].get('samix_source') == 'coco')
         return data_dict
 
 
@@ -806,6 +817,11 @@ class DataCollatorForSupervisedDataset(object):
             else:
                 batch['images'] = images
 
+        if any('samix_is_source' in instance for instance in instances):
+            batch['samix_is_source'] = torch.tensor(
+                [int(instance.get('samix_is_source', 0)) for instance in instances],
+                dtype=torch.long)
+
         return batch
 
 
@@ -819,6 +835,31 @@ def make_supervised_data_module(tokenizer: transformers.PreTrainedTokenizer,
     return dict(train_dataset=train_dataset,
                 eval_dataset=None,
                 data_collator=data_collator)
+
+
+def _adapter_state_path(path: str) -> str:
+    if os.path.isdir(path):
+        return os.path.join(path, "adapter_model.bin")
+    return path
+
+
+def _load_lora_adapter_state(model, path: Optional[str], adapter_name: str = "default"):
+    if not path:
+        return
+    state_path = _adapter_state_path(path)
+    if not os.path.isfile(state_path):
+        raise FileNotFoundError(f"LoRA adapter state not found: {state_path}")
+    from peft import set_peft_model_state_dict
+    state_dict = torch.load(state_path, map_location="cpu")
+    set_peft_model_state_dict(model, state_dict, adapter_name=adapter_name)
+    rank0_print(f"Loaded LoRA adapter '{adapter_name}' from {state_path}")
+
+
+def _freeze_lora_adapter(model, adapter_name: str):
+    marker = f".{adapter_name}."
+    for name, param in model.named_parameters():
+        if marker in name:
+            param.requires_grad = False
 
 
 def train(attn_implementation=None):
@@ -910,6 +951,13 @@ def train(attn_implementation=None):
                 model.to(torch.float16)
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model, lora_config)
+        _load_lora_adapter_state(model, training_args.lora_start_path, adapter_name="default")
+        if training_args.tp_samix_teacher_lora_path:
+            rank0_print("Adding frozen TP-SA-MIX teacher adapter...")
+            model.add_adapter("teacher", lora_config)
+            _load_lora_adapter_state(model, training_args.tp_samix_teacher_lora_path, adapter_name="teacher")
+            _freeze_lora_adapter(model, adapter_name="teacher")
+            model.set_adapter("default")
 
     if 'mpt' in model_args.model_name_or_path:
         tokenizer = transformers.AutoTokenizer.from_pretrained(
