@@ -44,7 +44,17 @@ fi
 
 echo "Model: $CHECKPOINT" > "$SUMMARY"
 echo "Official JSON root: $OFFICIAL_JSON_ROOT" >> "$SUMMARY"
+echo "Model base: $MODEL_BASE" >> "$SUMMARY"
 echo "" >> "$SUMMARY"
+
+model_base_args=()
+case "${MODEL_BASE,,}" in
+  ""|none|null)
+    ;;
+  *)
+    model_base_args+=(--model-base "$MODEL_BASE")
+    ;;
+esac
 
 has_task() {
   case ",$TASKS," in
@@ -67,7 +77,7 @@ run_vqa() {
   for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} "$PYTHON_BIN" -m llava.eval.model_vqa_loader \
       --model-path "$CHECKPOINT" \
-      --model-base "$MODEL_BASE" \
+      "${model_base_args[@]}" \
       --question-file "$question_file" \
       --image-folder "$image_folder" \
       --answers-file "$out_dir/${CHUNKS}_${IDX}.jsonl" \
