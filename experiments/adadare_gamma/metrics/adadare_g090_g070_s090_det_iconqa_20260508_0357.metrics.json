@@ -1,0 +1,21 @@
+{
+  "run_name": "adadare_g090_g070_s090_det_iconqa_20260508_0357",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-iconqa-adadare-g090-g070-s090-det-20260508_034603",
+  "tasks_completed": [
+    "iconqa"
+  ],
+  "metrics": {
+    "IconQA": 38.47,
+    "OKVQA": null,
+    "OCRVQA": null,
+    "GQA": null,
+    "TextVQA": null,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "bdab1f1f52c90aa9791783fc78cb12fb3788dc68",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/adadare_g090_g070_s090_det_iconqa_20260508_0357.log"
+}
