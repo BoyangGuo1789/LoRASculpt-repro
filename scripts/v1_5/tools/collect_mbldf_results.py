@@ -74,6 +74,7 @@ def main():
         "Delta_vs_current_best": (avg - current) if avg is not None else "",
         "required_gqa_for_target": metrics.get("required_gqa_for_target", ""),
         "promote_to_full_eval": metrics.get("promote_to_full_eval", ""),
+        "stop_reason": metrics.get("stop_reason", ""),
         "fusion_log_path": args.fusion_log_path,
         "eval_log_path": args.eval_log_path or metrics.get("log_file", ""),
         "summary_path": args.summary,
