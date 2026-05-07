@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 
 from llava.constants import IGNORE_INDEX, IMAGE_TOKEN_INDEX
-from llava.train.LoRASculpt_Trainer import CMR_LAMBDA, LoRASculpt
+from llava.train.LoRASculpt_Trainer import LoRASculpt
 
 
 class TPSAMIX(LoRASculpt):
@@ -201,5 +201,4 @@ class TPSAMIX(LoRASculpt):
                 )
 
         loss = loss + self._lora_l2_anchor_loss(model)
-        loss = loss + self.comput_custom_reg(model, reg_lambda=CMR_LAMBDA)
         return (loss, outputs) if return_outputs else loss
