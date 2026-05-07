@@ -1,0 +1,1 @@
+run_name,stage,checkpoint,basis,rule,OKVQA,OCRVQA,GQA,TextVQA,SourceAvg,IconQA,Avg,delta_vs_baseline,required_gqa_for_target,promote,stop_reason,log_file,git_commit

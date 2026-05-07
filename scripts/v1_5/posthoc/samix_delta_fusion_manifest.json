@@ -1,0 +1,61 @@
+{
+  "target_avg": 71.05375,
+  "exact_baseline_avg": 70.05375,
+  "current_best_avg": 70.09625,
+  "default": {
+    "gamma_base": 0.90,
+    "rank": 32,
+    "alpha": 64,
+    "mask_mode": "copy_base"
+  },
+  "candidates": [
+    {
+      "name": "samix1500_v_mid_l005",
+      "description": "Low-risk SA-MIX 1500 OCR delta into early/mid v_proj only.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "samix1500", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.05}
+      ]
+    },
+    {
+      "name": "samix1500_vo_mid_l005",
+      "description": "Low-risk SA-MIX 1500 OCR delta into early/mid v_proj and o_proj.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "samix1500", "module_groups": ["v", "o"], "bands": ["early", "mid"], "lambda": 0.05}
+      ]
+    },
+    {
+      "name": "samix3000_v_mid_l005",
+      "description": "Low-risk SA-MIX 3000 TextVQA delta into early/mid v_proj only.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "samix3000", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.05}
+      ]
+    },
+    {
+      "name": "samix1500_mlp_mid_l005",
+      "description": "Test whether SA-MIX OCR retention lives in MLP while preserving attention.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "samix1500", "module_groups": ["mlp"], "bands": ["early", "mid"], "lambda": 0.05}
+      ]
+    },
+    {
+      "name": "samix1500_v_mid_l010",
+      "description": "Stronger SA-MIX 1500 v_proj injection, only if l005 is stable.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "samix1500", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.10}
+      ]
+    },
+    {
+      "name": "samix3000_v_mid_l010",
+      "description": "Stronger SA-MIX 3000 v_proj injection, only if l005 is stable.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "samix3000", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.10}
+      ]
+    }
+  ]
+}
