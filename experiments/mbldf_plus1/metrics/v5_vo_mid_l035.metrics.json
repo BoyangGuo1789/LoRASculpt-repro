@@ -1,0 +1,25 @@
+{
+  "run_name": "v5_vo_mid_l035",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-mbldf-v5_vo_mid_l035",
+  "tasks_completed": [
+    "iconqa",
+    "okvqa",
+    "ocrvqa"
+  ],
+  "metrics": {
+    "IconQA": 86.27,
+    "OKVQA": 52.69,
+    "OCRVQA": 54.9,
+    "GQA": null,
+    "TextVQA": null,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "early_stop": true,
+  "stop_reason": "ocrvqa_gate_fail_lt_55.50",
+  "git_commit": "bff39cfc8954ed97929e020177f8bb004c219a30",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/v5_vo_mid_l035_partial_eval_20260507_120804.log"
+}

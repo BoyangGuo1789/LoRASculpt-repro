@@ -1,0 +1,19 @@
+{
+  "name": "v5_vo_mid_l035",
+  "description": "Stronger V5 v/o early+mid injection. Stop if IconQA drops.",
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "v5",
+      "module_groups": [
+        "v",
+        "o"
+      ],
+      "bands": [
+        "early",
+        "mid"
+      ],
+      "lambda": 0.35
+    }
+  ]
+}
