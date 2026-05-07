@@ -1,0 +1,1 @@
+run_name,stage,checkpoint,iconqa_train,coco_train,OKVQA,OCRVQA,GQA,TextVQA,SourceAvg,IconQA,Avg,delta_vs_baseline,promote,stop_reason,log_file,git_commit
