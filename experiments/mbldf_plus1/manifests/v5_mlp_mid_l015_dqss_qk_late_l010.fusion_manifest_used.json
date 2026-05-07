@@ -1,0 +1,29 @@
+{
+  "name": "v5_mlp_mid_l015_dqss_qk_late_l010",
+  "description": "Test whether V5 source retention lives partly in MLP while DQSS keeps late attention reasoning.",
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "v5",
+      "module_groups": [
+        "mlp"
+      ],
+      "bands": [
+        "early",
+        "mid"
+      ],
+      "lambda": 0.15
+    },
+    {
+      "basis": "dqss",
+      "module_groups": [
+        "q",
+        "k"
+      ],
+      "bands": [
+        "late"
+      ],
+      "lambda": 0.1
+    }
+  ]
+}
