@@ -12,6 +12,7 @@ GRADIENT_ACCUMULATION_STEPS=${GRADIENT_ACCUMULATION_STEPS:-1}
 NUM_TRAIN_EPOCHS=${NUM_TRAIN_EPOCHS:-1}
 LEARNING_RATE=${LEARNING_RATE:-2e-4}
 TRAINER_NAME=${TRAINER_NAME:-LLaVATrainer}
+PYTHON_BIN=${PYTHON_BIN:-/data/guoboyang/miniconda3/envs/lorasculpt/bin/python}
 DEEPSPEED_BIN=${DEEPSPEED_BIN:-/data/guoboyang/miniconda3/envs/lorasculpt/bin/deepspeed}
 RUN_NAME=${RUN_NAME:-source-okvqa-r32}
 TS=${TS:-$(date +%Y%m%d_%H%M%S)}
@@ -26,7 +27,7 @@ SAVE_STEPS=${SAVE_STEPS:-10000}
 cd "$CODE_DIR"
 
 if [ ! -f "$OKVQA_JSON" ]; then
-  python scripts/v1_5/train/build_okvqa_train_lora_json.py \
+  "$PYTHON_BIN" scripts/v1_5/train/build_okvqa_train_lora_json.py \
     --questions "$ROOT/data/okvqa/OpenEnded_mscoco_train2014_questions.json" \
     --annotations "$ROOT/data/okvqa/mscoco_train2014_annotations.json" \
     --image-root "$ROOT/data/coco/train2014" \

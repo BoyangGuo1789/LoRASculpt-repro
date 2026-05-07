@@ -1,0 +1,21 @@
+{
+  "run_name": "okvqadelta_s3000_okvqa_v_mid_l005_iconqa_20260508_011520",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-okvqadelta-okvqa_v_mid_l005",
+  "tasks_completed": [
+    "iconqa"
+  ],
+  "metrics": {
+    "IconQA": 86.26,
+    "OKVQA": null,
+    "OCRVQA": null,
+    "GQA": null,
+    "TextVQA": null,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "8b7e46b42c40e743fa5ae777dff094c7f511426b",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/okvqadelta_s3000_okvqa_v_mid_l005_iconqa_20260508_011520.log"
+}
