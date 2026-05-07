@@ -1,0 +1,19 @@
+{
+  "name": "v5_vo_mid_l020",
+  "description": "Inject V5 OCR/source vector into v_proj and o_proj in early+mid layers.",
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "v5",
+      "module_groups": [
+        "v",
+        "o"
+      ],
+      "bands": [
+        "early",
+        "mid"
+      ],
+      "lambda": 0.2
+    }
+  ]
+}
