@@ -1,0 +1,21 @@
+{
+  "name": "v5_qkv_light_l015",
+  "description": "Light V5 qkv all-band source injection.",
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "v5",
+      "module_groups": [
+        "q",
+        "k",
+        "v"
+      ],
+      "bands": [
+        "early",
+        "mid",
+        "late"
+      ],
+      "lambda": 0.15
+    }
+  ]
+}
