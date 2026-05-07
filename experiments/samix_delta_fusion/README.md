@@ -45,5 +45,7 @@ SA-MIX bases:
 Output root:
 
 ```text
-/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/samix_delta_fusion
+/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints
 ```
+
+Use `scripts/v1_5/posthoc/run_samix_delta_fusion_batch.sh` so generated checkpoint directory names contain both `llava` and `lora`; the LLaVA eval loader uses the directory basename to select the LoRA loading path.
