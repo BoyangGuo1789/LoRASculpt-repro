@@ -1,11 +1,11 @@
 #!/bin/bash
 set -euo pipefail
 
-CHECKPOINT=""
-RUN_NAME=""
-TASKS="iconqa,okvqa,ocrvqa,textvqa"
-OUTPUT_ROOT=""
-LOG_FILE=""
+CHECKPOINT="${CHECKPOINT:-}"
+RUN_NAME="${RUN_NAME:-}"
+TASKS="${TASKS:-iconqa,okvqa,ocrvqa,textvqa}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-}"
+LOG_FILE="${LOG_FILE:-}"
 
 while [ $# -gt 0 ]; do
   case "$1" in
