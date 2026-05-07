@@ -31,7 +31,7 @@ OUTPUT_DIR_SUFFIX=""
 extra_args=()
 if [[ "${SMOKE:-0}" == "1" ]]; then
     export STEP_THRESHOLD=${STEP_THRESHOLD_OVERRIDE:-1}
-    : ${MAX_STEPS:=2}
+    : ${MAX_STEPS:=$SMOKE_MAX_STEPS}
     OUTPUT_DIR_SUFFIX="-smoke"
     extra_args+=(--max_steps "$MAX_STEPS" --save_steps "$MAX_STEPS")
 elif [[ -n "${MAX_STEPS:-}" ]]; then
@@ -46,6 +46,9 @@ echo "[LoRASculpt-MIG-DIS] image_folder=$IMAGE_FOLDER_OVERRIDE"
 echo "[LoRASculpt-MIG-DIS] output_dir=$OUTPUT_DIR"
 echo "[LoRASculpt-MIG-DIS] trainer=$TRAINER_NAME rank=$LORA_RANK alpha=$LORA_ALPHA"
 echo "[LoRASculpt-MIG-DIS] grad_mix=$MIGDIS_GRAD_MIX source_margin=$MIGDIS_SOURCE_MARGIN source_scope=$MIGDIS_SOURCE_SCOPE beta=$MIGDIS_GRAD_EMA_BETA norm=$MIGDIS_NORM"
+echo "[LoRASculpt-MIG-DIS] selection_mode=$MIGDIS_SELECTION_MODE tgsr_candidate_ratio=$MIGDIS_TGSR_CANDIDATE_RATIO tgsr_core_source_margin=$MIGDIS_TGSR_CORE_SOURCE_MARGIN"
+echo "[LoRASculpt-MIG-DIS] dqss_rho=$MIGDIS_DQSS_RHO dqss_aux_grad_mix=$MIGDIS_DQSS_AUX_GRAD_MIX dqss_aux_source_margin=$MIGDIS_DQSS_AUX_SOURCE_MARGIN dqss_module_scope=$MIGDIS_DQSS_MODULE_SCOPE"
+echo "[LoRASculpt-MIG-DIS] dqss_anti_collapse=$MIGDIS_DQSS_ANTI_COLLAPSE dqss_max_aux_overlap=$MIGDIS_DQSS_MAX_AUX_OVERLAP dqss_min_core_overlap=$MIGDIS_DQSS_MIN_CORE_OVERLAP"
 echo "[LoRASculpt-MIG-DIS] step_threshold=$STEP_THRESHOLD extra_args=${extra_args[*]:-}"
 
 "$DEEPSPEED_BIN" --include "$DEVICE" --master_port "$MASTER_PORT" llava/train/train_mem.py \
@@ -96,4 +99,16 @@ echo "[LoRASculpt-MIG-DIS] step_threshold=$STEP_THRESHOLD extra_args=${extra_arg
     --migdis_source_chunk_rows "$MIGDIS_SOURCE_CHUNK_ROWS" \
     --migdis_final_gamma "$MIGDIS_FINAL_GAMMA" \
     --migdis_debug_dump "$MIGDIS_DEBUG_DUMP" \
+    --migdis_selection_mode "$MIGDIS_SELECTION_MODE" \
+    --migdis_tgsr_candidate_ratio "$MIGDIS_TGSR_CANDIDATE_RATIO" \
+    --migdis_tgsr_core_source_margin "$MIGDIS_TGSR_CORE_SOURCE_MARGIN" \
+    --migdis_tgsr_debug_overlap "$MIGDIS_TGSR_DEBUG_OVERLAP" \
+    --migdis_dqss_aux_grad_mix "$MIGDIS_DQSS_AUX_GRAD_MIX" \
+    --migdis_dqss_aux_source_margin "$MIGDIS_DQSS_AUX_SOURCE_MARGIN" \
+    --migdis_dqss_rho "$MIGDIS_DQSS_RHO" \
+    --migdis_dqss_debug_overlap "$MIGDIS_DQSS_DEBUG_OVERLAP" \
+    --migdis_dqss_module_scope "$MIGDIS_DQSS_MODULE_SCOPE" \
+    --migdis_dqss_anti_collapse "$MIGDIS_DQSS_ANTI_COLLAPSE" \
+    --migdis_dqss_max_aux_overlap "$MIGDIS_DQSS_MAX_AUX_OVERLAP" \
+    --migdis_dqss_min_core_overlap "$MIGDIS_DQSS_MIN_CORE_OVERLAP" \
     "${extra_args[@]}"

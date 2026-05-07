@@ -131,6 +131,18 @@ class TrainingArguments(transformers.TrainingArguments):
     migdis_source_chunk_rows: int = field(default=2048)
     migdis_final_gamma: float = field(default=1.0)
     migdis_debug_dump: bool = field(default=True)
+    migdis_selection_mode: str = field(default="global")
+    migdis_tgsr_candidate_ratio: float = field(default=0.50)
+    migdis_tgsr_core_source_margin: float = field(default=0.35)
+    migdis_tgsr_debug_overlap: bool = field(default=True)
+    migdis_dqss_aux_grad_mix: float = field(default=0.25)
+    migdis_dqss_aux_source_margin: float = field(default=0.70)
+    migdis_dqss_rho: float = field(default=0.25)
+    migdis_dqss_debug_overlap: bool = field(default=True)
+    migdis_dqss_module_scope: str = field(default="qkv")
+    migdis_dqss_anti_collapse: bool = field(default=True)
+    migdis_dqss_max_aux_overlap: float = field(default=0.98)
+    migdis_dqss_min_core_overlap: float = field(default=0.70)
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):

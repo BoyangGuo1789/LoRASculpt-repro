@@ -30,6 +30,8 @@ data/
 models/
 downloads/
 logs/
+!docs/agent_work/logs/
+!docs/agent_work/logs/**
 repro_results/
 checkpoints/
 *.pt

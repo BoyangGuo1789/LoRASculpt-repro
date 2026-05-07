@@ -272,6 +272,53 @@ class LoRASculptMIGDIS(LLaVATrainer):
     def _migdis_debug_dump(self):
         return self._migdis_bool(getattr(self.args, "migdis_debug_dump", os.environ.get("MIGDIS_DEBUG_DUMP", "true")))
 
+    def _migdis_selection_mode(self):
+        mode = str(getattr(self.args, "migdis_selection_mode", os.environ.get("MIGDIS_SELECTION_MODE", "global"))).lower()
+        if mode not in ("global", "tgsr", "dqss"):
+            raise ValueError(f"Unsupported MIG-DIS selection mode: {mode}")
+        return mode
+
+    def _migdis_tgsr_candidate_ratio(self):
+        return self._migdis_arg("migdis_tgsr_candidate_ratio", "MIGDIS_TGSR_CANDIDATE_RATIO", 0.50, float)
+
+    def _migdis_tgsr_core_source_margin(self):
+        return self._migdis_arg("migdis_tgsr_core_source_margin", "MIGDIS_TGSR_CORE_SOURCE_MARGIN", 0.35, float)
+
+    def _migdis_tgsr_debug_overlap(self):
+        return self._migdis_bool(
+            getattr(self.args, "migdis_tgsr_debug_overlap", os.environ.get("MIGDIS_TGSR_DEBUG_OVERLAP", "true"))
+        )
+
+    def _migdis_dqss_aux_grad_mix(self):
+        return self._migdis_arg("migdis_dqss_aux_grad_mix", "MIGDIS_DQSS_AUX_GRAD_MIX", 0.25, float)
+
+    def _migdis_dqss_aux_source_margin(self):
+        return self._migdis_arg("migdis_dqss_aux_source_margin", "MIGDIS_DQSS_AUX_SOURCE_MARGIN", 0.70, float)
+
+    def _migdis_dqss_rho(self):
+        return self._migdis_arg("migdis_dqss_rho", "MIGDIS_DQSS_RHO", 0.25, float)
+
+    def _migdis_dqss_debug_overlap(self):
+        return self._migdis_bool(
+            getattr(self.args, "migdis_dqss_debug_overlap", os.environ.get("MIGDIS_DQSS_DEBUG_OVERLAP", "true"))
+        )
+
+    def _migdis_dqss_module_scope(self):
+        return str(
+            getattr(self.args, "migdis_dqss_module_scope", os.environ.get("MIGDIS_DQSS_MODULE_SCOPE", "qkv"))
+        ).lower()
+
+    def _migdis_dqss_anti_collapse(self):
+        return self._migdis_bool(
+            getattr(self.args, "migdis_dqss_anti_collapse", os.environ.get("MIGDIS_DQSS_ANTI_COLLAPSE", "true"))
+        )
+
+    def _migdis_dqss_max_aux_overlap(self):
+        return self._migdis_arg("migdis_dqss_max_aux_overlap", "MIGDIS_DQSS_MAX_AUX_OVERLAP", 0.98, float)
+
+    def _migdis_dqss_min_core_overlap(self):
+        return self._migdis_arg("migdis_dqss_min_core_overlap", "MIGDIS_DQSS_MIN_CORE_OVERLAP", 0.70, float)
+
     def _migdis_log(self, message):
         logger.info(message)
         try:
@@ -405,6 +452,34 @@ class LoRASculptMIGDIS(LLaVATrainer):
             return True
         return any(proj in name for proj in ("q_proj", "k_proj", "v_proj"))
 
+    def _migdis_is_qkv_module(self, name):
+        return any(proj in name for proj in ("q_proj", "k_proj", "v_proj"))
+
+    def _migdis_dqss_should_apply(self, name):
+        scope = self._migdis_dqss_module_scope()
+        if scope == "all":
+            return True
+        if scope == "none":
+            return False
+        tokens = [token.strip() for token in scope.replace("+", ",").split(",") if token.strip()]
+        aliases = {
+            "qkv": ("q_proj", "k_proj", "v_proj"),
+            "qk": ("q_proj", "k_proj"),
+            "qv": ("q_proj", "v_proj"),
+            "kv": ("k_proj", "v_proj"),
+            "q": ("q_proj",),
+            "k": ("k_proj",),
+            "v": ("v_proj",),
+            "o": ("o_proj",),
+            "mlp": ("gate_proj", "up_proj", "down_proj"),
+        }
+        if not tokens:
+            tokens = ["qkv"]
+        projections = []
+        for token in tokens:
+            projections.extend(aliases.get(token, (token,)))
+        return any(proj in name for proj in projections)
+
     def _migdis_source_row_col_stats(self, weight_param):
         weight = self._migdis_full_param(weight_param)
         if weight.dim() != 2:
@@ -459,27 +534,52 @@ class LoRASculptMIGDIS(LLaVATrainer):
         beta = self._migdis_grad_ema_beta()
         return grad_ema.to(lora_param.device) / (1.0 - beta ** steps + self._migdis_eps())
 
-    def _migdis_build_score(self, name, lora_param, base_param):
-        grad_mix = self._migdis_grad_mix()
+    def _migdis_build_score_bundle(
+        self,
+        name,
+        lora_param,
+        base_param,
+        grad_mix=None,
+        source_margin=None,
+        core_source_margin=None,
+    ):
+        grad_mix = self._migdis_grad_mix() if grad_mix is None else float(grad_mix)
+        source_margin = self._migdis_source_margin() if source_margin is None else float(source_margin)
+        core_source_margin = (
+            self._migdis_tgsr_core_source_margin() if core_source_margin is None else float(core_source_margin)
+        )
         task_score = (1.0 - grad_mix) * self._migdis_norm(lora_param.abs())
         grad_hat = self._migdis_grad_hat(name, lora_param)
         task_score = task_score + grad_mix * self._migdis_norm(grad_hat)
 
         penalty, source_stats = self._migdis_source_penalty(name, lora_param, base_param)
-        source_applied = penalty is not None and self._migdis_source_margin() != 0.0
+        source_applied = penalty is not None
         if source_applied:
-            score = task_score - self._migdis_source_margin() * self._migdis_norm(penalty)
+            penalty_score = self._migdis_norm(penalty)
+            score = task_score - source_margin * penalty_score
+            core_score = task_score - core_source_margin * penalty_score
         else:
             score = task_score
+            core_score = task_score
 
         stats = {
+            "grad_mix": float(grad_mix),
+            "source_margin": float(source_margin),
+            "core_source_margin": float(core_source_margin),
             "grad_ema_mean": float(grad_hat.float().mean().item()),
             "score_mean": float(score.float().mean().item()),
+            "task_score_mean": float(task_score.float().mean().item()),
+            "Q_core_mean": float(core_score.float().mean().item()),
+            "Q_src_mean": float(score.float().mean().item()),
             "source_scope_applied": bool(source_applied),
         }
         if source_stats:
             stats.update(source_stats)
-        return score.detach(), stats
+        return {
+            "score": score.detach(),
+            "core_score": core_score.detach(),
+            "stats": stats,
+        }
 
     def _migdis_make_topk_mask(self, score, keep_ratio):
         flat_score = score.float().flatten()
@@ -489,6 +589,129 @@ class LoRASculptMIGDIS(LLaVATrainer):
         mask[top_indices] = 1
         return top_indices, mask.reshape(score.shape)
 
+    def _migdis_make_tgsr_mask(self, core_score, source_score, keep_ratio, candidate_ratio):
+        flat_core = core_score.detach().float().flatten()
+        flat_src = source_score.detach().float().flatten()
+        n = flat_core.numel()
+        k = max(1, int(math.ceil(float(keep_ratio) * n)))
+        kc = max(k, int(math.ceil(float(candidate_ratio) * n)))
+        kc = min(kc, n)
+
+        candidate_idx = torch.topk(flat_core, k=kc, largest=True, sorted=False).indices
+        candidate_scores = flat_src[candidate_idx]
+        local_idx = torch.topk(candidate_scores, k=k, largest=True, sorted=False).indices
+        final_idx = candidate_idx[local_idx]
+
+        flat_mask = torch.zeros_like(flat_core, dtype=source_score.dtype, device=source_score.device)
+        flat_mask[final_idx] = 1
+
+        stats = {
+            "candidate_ratio_effective": float(kc / max(n, 1)),
+            "retain_ratio": float(k / max(n, 1)),
+        }
+        if self._migdis_tgsr_debug_overlap():
+            core_topk = torch.topk(flat_core, k=k, largest=True, sorted=False).indices
+            src_topk = torch.topk(flat_src, k=k, largest=True, sorted=False).indices
+            final_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            core_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            src_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            final_bool[final_idx] = True
+            core_bool[core_topk] = True
+            src_bool[src_topk] = True
+            stats["overlap_with_core_topk"] = float((final_bool & core_bool).sum().item() / k)
+            stats["overlap_with_src_global_topk"] = float((final_bool & src_bool).sum().item() / k)
+
+        return final_idx, flat_mask.reshape(source_score.shape), stats
+
+    def _migdis_make_dqss_mask(self, core_score, aux_score, keep_ratio, rho):
+        flat_core = core_score.detach().float().flatten()
+        flat_aux = aux_score.detach().float().flatten()
+        n = flat_core.numel()
+        k = max(1, int(math.ceil(float(keep_ratio) * n)))
+        if k <= 1:
+            k_aux = 0
+        else:
+            k_aux = int(math.ceil(float(rho) * k))
+            k_aux = min(max(1, k_aux), k - 1)
+        k_core = k - k_aux
+
+        core_idx = torch.topk(flat_core, k=k_core, largest=True, sorted=False).indices
+        if k_aux > 0:
+            aux_score_for_pick = flat_aux.clone()
+            aux_score_for_pick[core_idx] = -torch.inf
+            aux_idx = torch.topk(aux_score_for_pick, k=k_aux, largest=True, sorted=False).indices
+            final_idx = torch.cat([core_idx, aux_idx], dim=0)
+        else:
+            aux_idx = torch.empty(0, dtype=core_idx.dtype, device=core_idx.device)
+            final_idx = core_idx
+
+        guard_replacements = 0
+        core_topk = None
+        aux_topk = None
+        if self._migdis_dqss_debug_overlap() or self._migdis_dqss_anti_collapse():
+            core_topk = torch.topk(flat_core, k=k, largest=True, sorted=False).indices
+            aux_topk = torch.topk(flat_aux, k=k, largest=True, sorted=False).indices
+
+        if self._migdis_dqss_anti_collapse() and k_aux > 0 and aux_topk is not None and core_topk is not None:
+            max_aux_overlap = min(max(self._migdis_dqss_max_aux_overlap(), 0.0), 1.0)
+            min_core_overlap = min(max(self._migdis_dqss_min_core_overlap(), 0.0), 1.0)
+            aux_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            core_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            final_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            aux_bool[aux_topk] = True
+            core_bool[core_topk] = True
+            final_bool[final_idx] = True
+
+            aux_overlap_count = int((final_bool & aux_bool).sum().item())
+            core_overlap_count = int((final_bool & core_bool).sum().item())
+            max_aux_count = int(math.floor((max_aux_overlap - 1e-6) * k))
+            min_core_count = int(math.ceil(min_core_overlap * k))
+            required_replace = max(0, aux_overlap_count - max_aux_count)
+            core_budget = max(0, core_overlap_count - min_core_count)
+            if required_replace > 0 and core_budget > 0:
+                core_overlap_positions = torch.nonzero(aux_bool[core_idx], as_tuple=False).flatten()
+                candidate_mask = torch.ones(n, dtype=torch.bool, device=flat_core.device)
+                candidate_mask[final_idx] = False
+                candidate_mask[aux_topk] = False
+                candidate_idx = torch.nonzero(candidate_mask, as_tuple=False).flatten()
+                num_replace = min(required_replace, core_budget, int(core_overlap_positions.numel()), int(candidate_idx.numel()))
+                if num_replace > 0:
+                    replacement_local = torch.topk(
+                        flat_core[candidate_idx], k=num_replace, largest=True, sorted=False
+                    ).indices
+                    replacement_idx = candidate_idx[replacement_local]
+                    replace_scores = flat_core[core_idx[core_overlap_positions]]
+                    replace_local = torch.topk(-replace_scores, k=num_replace, largest=True, sorted=False).indices
+                    replace_positions = core_overlap_positions[replace_local]
+                    core_idx = core_idx.clone()
+                    core_idx[replace_positions] = replacement_idx
+                    final_idx = torch.cat([core_idx, aux_idx], dim=0)
+                    guard_replacements = int(num_replace)
+
+        flat_mask = torch.zeros_like(flat_core, dtype=core_score.dtype, device=core_score.device)
+        flat_mask[final_idx] = 1
+
+        stats = {
+            "retain_ratio": float(k / max(n, 1)),
+            "dqss_core_count": int(k_core),
+            "dqss_aux_count": int(k_aux),
+            "dqss_aux_fraction": float(k_aux / max(k, 1)),
+            "dqss_guard_replacements": guard_replacements,
+            "dqss_guard_max_aux_overlap": float(self._migdis_dqss_max_aux_overlap()),
+            "dqss_guard_min_core_overlap": float(self._migdis_dqss_min_core_overlap()),
+        }
+        if self._migdis_dqss_debug_overlap() and core_topk is not None and aux_topk is not None:
+            final_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            core_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            aux_bool = torch.zeros(n, dtype=torch.bool, device=flat_core.device)
+            final_bool[final_idx] = True
+            core_bool[core_topk] = True
+            aux_bool[aux_topk] = True
+            stats["overlap_with_core_global_topk"] = float((final_bool & core_bool).sum().item() / k)
+            stats["overlap_with_aux_global_topk"] = float((final_bool & aux_bool).sum().item() / k)
+
+        return final_idx, flat_mask.reshape(core_score.shape), stats
+
     def _migdis_build_masks_once(self, model):
         if getattr(self, "migdis_masks_built", False):
             return
@@ -497,8 +720,22 @@ class LoRASculptMIGDIS(LLaVATrainer):
         self._migdis_log(
             f"MIG-DIS prune triggered at global_step={self.state.global_step}; "
             f"grad_mix={self._migdis_grad_mix()} source_margin={self._migdis_source_margin()} "
-            f"source_scope={self._migdis_source_scope()} norm={self._migdis_norm_mode()}"
+            f"source_scope={self._migdis_source_scope()} norm={self._migdis_norm_mode()} "
+            f"selection_mode={self._migdis_selection_mode()}"
         )
+        self._migdis_log(f"MIG-DIS selection_mode={self._migdis_selection_mode()}")
+        if self._migdis_selection_mode() == "tgsr":
+            self._migdis_log(
+                f"MIG-DIS-TGSR candidate_ratio={self._migdis_tgsr_candidate_ratio()} "
+                f"core_source_margin={self._migdis_tgsr_core_source_margin()}"
+            )
+        if self._migdis_selection_mode() == "dqss":
+            self._migdis_log(
+                f"MIG-DIS-DQSS rho={self._migdis_dqss_rho()} "
+                f"aux_grad_mix={self._migdis_dqss_aux_grad_mix()} "
+                f"aux_source_margin={self._migdis_dqss_aux_source_margin()} "
+                f"module_scope={self._migdis_dqss_module_scope()}"
+            )
         self._migdis_log("MIG-DIS connector hard masked=false")
 
         dict_pt = {}
@@ -516,12 +753,52 @@ class LoRASculptMIGDIS(LLaVATrainer):
 
             lora_param = self._migdis_full_param(param)
             base_param = dict_pt.get(self._migdis_normalize_lora_key(name))
-            score, score_stats = (
-                self._migdis_build_score(name, lora_param, base_param)
-                if self._migdis_enabled()
-                else (lora_param.abs(), {})
-            )
-            top_indices, coef_matrix = self._migdis_make_topk_mask(score, AB_PRESERVE_RATIO)
+            if self._migdis_enabled():
+                score_bundle = self._migdis_build_score_bundle(name, lora_param, base_param)
+            else:
+                score_bundle = {
+                    "score": lora_param.abs().detach(),
+                    "core_score": lora_param.abs().detach(),
+                    "stats": {},
+                }
+            score_stats = score_bundle["stats"]
+            selection_stats = {}
+            if self._migdis_enabled() and self._migdis_selection_mode() == "tgsr":
+                top_indices, coef_matrix, selection_stats = self._migdis_make_tgsr_mask(
+                    score_bundle["core_score"],
+                    score_bundle["score"],
+                    AB_PRESERVE_RATIO,
+                    self._migdis_tgsr_candidate_ratio(),
+                )
+            elif (
+                self._migdis_enabled()
+                and self._migdis_selection_mode() == "dqss"
+                and self._migdis_dqss_should_apply(name)
+                and score_stats.get("source_scope_applied", False)
+            ):
+                aux_bundle = self._migdis_build_score_bundle(
+                    name,
+                    lora_param,
+                    base_param,
+                    grad_mix=self._migdis_dqss_aux_grad_mix(),
+                    source_margin=self._migdis_dqss_aux_source_margin(),
+                    core_source_margin=self._migdis_dqss_aux_source_margin(),
+                )
+                top_indices, coef_matrix, selection_stats = self._migdis_make_dqss_mask(
+                    score_bundle["score"],
+                    aux_bundle["score"],
+                    AB_PRESERVE_RATIO,
+                    self._migdis_dqss_rho(),
+                )
+                aux_stats = aux_bundle["stats"]
+                score_stats["Q_aux_mean"] = aux_stats.get("score_mean", 0.0)
+                score_stats["aux_grad_ema_mean"] = aux_stats.get("grad_ema_mean", 0.0)
+                score_stats["aux_grad_mix"] = aux_stats.get("grad_mix", self._migdis_dqss_aux_grad_mix())
+                score_stats["aux_source_margin"] = aux_stats.get(
+                    "source_margin", self._migdis_dqss_aux_source_margin()
+                )
+            else:
+                top_indices, coef_matrix = self._migdis_make_topk_mask(score_bundle["score"], AB_PRESERVE_RATIO)
             scaled_lora_param = coef_matrix.to(lora_param.device) * lora_param * self._migdis_final_gamma()
             safe_set_full_fp32_param(param, scaled_lora_param)
             self.AB_masks[name] = top_indices
@@ -529,18 +806,78 @@ class LoRASculptMIGDIS(LLaVATrainer):
             density = float(coef_matrix.sum().item() / coef_matrix.numel())
             key = self._migdis_normalize_lora_key(name)
             module_stats = debug_by_module.setdefault(key, {"module": key})
+            module_stats["selection_mode"] = self._migdis_selection_mode()
+            module_stats["source_scope"] = self._migdis_source_scope()
+            module_stats["grad_mix"] = score_stats.get("grad_mix", self._migdis_grad_mix())
+            module_stats["core_source_margin"] = score_stats.get(
+                "core_source_margin", self._migdis_tgsr_core_source_margin()
+            )
+            module_stats["source_margin"] = score_stats.get("source_margin", self._migdis_source_margin())
+            module_stats["candidate_ratio_requested"] = self._migdis_tgsr_candidate_ratio()
+            module_stats["dqss_module_scope"] = self._migdis_dqss_module_scope()
+            module_stats["dqss_rho"] = self._migdis_dqss_rho()
+            module_stats["dqss_aux_grad_mix"] = score_stats.get(
+                "aux_grad_mix", self._migdis_dqss_aux_grad_mix()
+            )
+            module_stats["dqss_aux_source_margin"] = score_stats.get(
+                "aux_source_margin", self._migdis_dqss_aux_source_margin()
+            )
             if "lora_A" in name:
                 active_a.append(density)
                 module_stats["A_shape"] = list(lora_param.shape)
                 module_stats["mask_density_A"] = density
+                module_stats["retain_ratio_A"] = selection_stats.get("retain_ratio", density)
+                module_stats["candidate_ratio_effective_A"] = selection_stats.get("candidate_ratio_effective", 1.0)
+                if "dqss_aux_fraction" in selection_stats:
+                    module_stats["dqss_aux_fraction_A"] = selection_stats["dqss_aux_fraction"]
+                    module_stats["dqss_core_count_A"] = selection_stats["dqss_core_count"]
+                    module_stats["dqss_aux_count_A"] = selection_stats["dqss_aux_count"]
+                    module_stats["dqss_guard_replacements_A"] = selection_stats.get("dqss_guard_replacements", 0)
                 module_stats["grad_ema_mean_A"] = score_stats.get("grad_ema_mean", 0.0)
                 module_stats["score_A_mean"] = score_stats.get("score_mean", 0.0)
+                module_stats["Q_core_A_mean"] = score_stats.get("Q_core_mean", 0.0)
+                module_stats["Q_src_A_mean"] = score_stats.get("Q_src_mean", score_stats.get("score_mean", 0.0))
+                module_stats["Q_aux_A_mean"] = score_stats.get("Q_aux_mean", 0.0)
+                if "overlap_with_core_topk" in selection_stats:
+                    module_stats["overlap_with_core_topk_A"] = selection_stats["overlap_with_core_topk"]
+                if "overlap_with_src_global_topk" in selection_stats:
+                    module_stats["overlap_with_src_global_topk_A"] = selection_stats["overlap_with_src_global_topk"]
+                if "overlap_with_core_global_topk" in selection_stats:
+                    module_stats["overlap_with_core_global_topk_A"] = selection_stats[
+                        "overlap_with_core_global_topk"
+                    ]
+                if "overlap_with_aux_global_topk" in selection_stats:
+                    module_stats["overlap_with_aux_global_topk_A"] = selection_stats[
+                        "overlap_with_aux_global_topk"
+                    ]
             elif "lora_B" in name:
                 active_b.append(density)
                 module_stats["B_shape"] = list(lora_param.shape)
                 module_stats["mask_density_B"] = density
+                module_stats["retain_ratio_B"] = selection_stats.get("retain_ratio", density)
+                module_stats["candidate_ratio_effective_B"] = selection_stats.get("candidate_ratio_effective", 1.0)
+                if "dqss_aux_fraction" in selection_stats:
+                    module_stats["dqss_aux_fraction_B"] = selection_stats["dqss_aux_fraction"]
+                    module_stats["dqss_core_count_B"] = selection_stats["dqss_core_count"]
+                    module_stats["dqss_aux_count_B"] = selection_stats["dqss_aux_count"]
+                    module_stats["dqss_guard_replacements_B"] = selection_stats.get("dqss_guard_replacements", 0)
                 module_stats["grad_ema_mean_B"] = score_stats.get("grad_ema_mean", 0.0)
                 module_stats["score_B_mean"] = score_stats.get("score_mean", 0.0)
+                module_stats["Q_core_B_mean"] = score_stats.get("Q_core_mean", 0.0)
+                module_stats["Q_src_B_mean"] = score_stats.get("Q_src_mean", score_stats.get("score_mean", 0.0))
+                module_stats["Q_aux_B_mean"] = score_stats.get("Q_aux_mean", 0.0)
+                if "overlap_with_core_topk" in selection_stats:
+                    module_stats["overlap_with_core_topk_B"] = selection_stats["overlap_with_core_topk"]
+                if "overlap_with_src_global_topk" in selection_stats:
+                    module_stats["overlap_with_src_global_topk_B"] = selection_stats["overlap_with_src_global_topk"]
+                if "overlap_with_core_global_topk" in selection_stats:
+                    module_stats["overlap_with_core_global_topk_B"] = selection_stats[
+                        "overlap_with_core_global_topk"
+                    ]
+                if "overlap_with_aux_global_topk" in selection_stats:
+                    module_stats["overlap_with_aux_global_topk_B"] = selection_stats[
+                        "overlap_with_aux_global_topk"
+                    ]
             module_stats["source_scope_applied"] = bool(score_stats.get("source_scope_applied", False))
             if "source_row_mean" in score_stats:
                 module_stats["source_row_mean"] = score_stats["source_row_mean"]

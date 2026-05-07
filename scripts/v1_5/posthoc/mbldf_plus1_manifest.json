@@ -1,0 +1,89 @@
+{
+  "target_avg": 71.05375,
+  "exact_baseline_avg": 70.05375,
+  "current_best_avg": 70.09625,
+  "default": {
+    "gamma_base": 0.90,
+    "lambda_v5": 0.0,
+    "lambda_dqss": 0.0,
+    "lambda_v4": 0.0,
+    "rank": 32,
+    "alpha": 64,
+    "mask_mode": "copy_base"
+  },
+  "candidates": [
+    {
+      "name": "identity_g090",
+      "description": "Baseline gamma=0.90 identity candidate. Used only for fusion smoke and key validation.",
+      "gamma_base": 0.90,
+      "rules": []
+    },
+    {
+      "name": "v5_v_mid_l020",
+      "description": "Inject V5 OCR/source vector into v_proj in early+mid layers.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["v"], "bands": ["early", "mid"], "lambda": 0.20}
+      ]
+    },
+    {
+      "name": "v5_vo_mid_l020",
+      "description": "Inject V5 OCR/source vector into v_proj and o_proj in early+mid layers.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["v", "o"], "bands": ["early", "mid"], "lambda": 0.20}
+      ]
+    },
+    {
+      "name": "v5_vo_mid_l035",
+      "description": "Stronger V5 v/o early+mid injection. Stop if IconQA drops.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["v", "o"], "bands": ["early", "mid"], "lambda": 0.35}
+      ]
+    },
+    {
+      "name": "v5_qkv_light_l015",
+      "description": "Light V5 qkv all-band source injection.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["q", "k", "v"], "bands": ["early", "mid", "late"], "lambda": 0.15}
+      ]
+    },
+    {
+      "name": "dqss_qk_late_l015",
+      "description": "Inject DQSS target/reasoning vector into late q/k only.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "dqss", "module_groups": ["q", "k"], "bands": ["late"], "lambda": 0.15}
+      ]
+    },
+    {
+      "name": "v5_vo_mid_l020_dqss_qk_late_l010",
+      "description": "Primary hypothesis: V5 OCR vector in early/mid v/o plus DQSS reasoning vector in late q/k.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["v", "o"], "bands": ["early", "mid"], "lambda": 0.20},
+        {"basis": "dqss", "module_groups": ["q", "k"], "bands": ["late"], "lambda": 0.10}
+      ]
+    },
+    {
+      "name": "v5_vo_mid_l035_dqss_qk_late_l015",
+      "description": "Higher-risk stronger version of the primary hypothesis.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["v", "o"], "bands": ["early", "mid"], "lambda": 0.35},
+        {"basis": "dqss", "module_groups": ["q", "k"], "bands": ["late"], "lambda": 0.15}
+      ]
+    },
+    {
+      "name": "v5_mlp_mid_l015_dqss_qk_late_l010",
+      "description": "Test whether V5 source retention lives partly in MLP while DQSS keeps late attention reasoning.",
+      "gamma_base": 0.90,
+      "rules": [
+        {"basis": "v5", "module_groups": ["mlp"], "bands": ["early", "mid"], "lambda": 0.15},
+        {"basis": "dqss", "module_groups": ["q", "k"], "bands": ["late"], "lambda": 0.10}
+      ]
+    }
+  ]
+}
