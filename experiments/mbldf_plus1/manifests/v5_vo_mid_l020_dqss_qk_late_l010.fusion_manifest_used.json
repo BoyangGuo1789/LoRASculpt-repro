@@ -1,0 +1,30 @@
+{
+  "name": "v5_vo_mid_l020_dqss_qk_late_l010",
+  "description": "Primary hypothesis: V5 OCR vector in early/mid v/o plus DQSS reasoning vector in late q/k.",
+  "gamma_base": 0.9,
+  "rules": [
+    {
+      "basis": "v5",
+      "module_groups": [
+        "v",
+        "o"
+      ],
+      "bands": [
+        "early",
+        "mid"
+      ],
+      "lambda": 0.2
+    },
+    {
+      "basis": "dqss",
+      "module_groups": [
+        "q",
+        "k"
+      ],
+      "bands": [
+        "late"
+      ],
+      "lambda": 0.1
+    }
+  ]
+}
