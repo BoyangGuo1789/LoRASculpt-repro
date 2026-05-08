@@ -4,6 +4,21 @@
 
 This repository is the durable source of truth for agent work on LoRASculpt. Do not rely on a separate local `Agent.md` for project state, plans, or handoff history.
 
+## 0. Baseline-First Research Constraint
+
+The paper story must stay within the LoRASculpt baseline training paradigm. Do not treat "turn LoRA off for non-target tasks" or task-aware checkpoint routing as the final contribution; that result is only a diagnostic showing source/general forgetting under always-on target LoRA.
+
+Before proposing or running the next method, first analyze the baseline's limitations from code, paper materials, ledgers, and logs. The next publishable direction must introduce a module, component, objective, mask/scoring rule, regularizer, routing mechanism internal to the model, or training-time procedure that upgrades the baseline while preserving a comparable inference setting. Prefer ideas that can be described as a real method improvement over the baseline, not as post-hoc evaluation protocol selection.
+
+Required research loop:
+
+1. State the baseline limitation being targeted.
+2. State the mechanism hypothesis.
+3. Design the smallest module/component/training change that directly addresses it.
+4. Run smoke verification before full experiments.
+5. Compare against the exact baseline and current best static result.
+6. Reject directions whose only gain comes from external task labels choosing between independent checkpoints.
+
 ## 1. Mandatory Repository Artifacts
 
 All durable agent coordination artifacts must live under `docs/agent_work/`:

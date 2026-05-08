@@ -1,11 +1,11 @@
 # Agent Task State
 
-Last updated: 2026-05-06 Asia/Shanghai
+Last updated: 2026-05-08 Asia/Shanghai
 Current state: DONE
 
 ## Active Task
 
-Add a repository rule requiring a Git/GitHub traceability point after each completed version-level code change, excluding parameter-only changes.
+Add a repository research-direction rule: future paper-oriented work must return to the LoRASculpt baseline training paradigm, diagnose baseline limitations, and propose module/component/training innovations rather than using task-aware LoRA-off routing as the final story.
 
 ## State Machine
 
@@ -15,32 +15,22 @@ BACKLOG -> PLANNING -> EXECUTING -> VERIFYING -> REVIEW -> DONE
 
 ## Latest Transition
 
-`REVIEW -> DONE`: `AGENTS.md` now includes a Version Commit / GitHub Traceability policy. The session and plan templates now include commit-related fields.
+`REVIEW -> DONE`: `AGENTS.md` now contains a Baseline-First Research Constraint. The local anchor `AGENTS.md` was updated with the same rule.
 
 ## Latest Evidence
 
-- `grep` verification confirmed `AGENTS.md` contains the new `Version Commit / GitHub Traceability` section.
-- `grep` verification confirmed `docs/agent_work/templates/session_log_template.md` contains `Git / Commit Status`.
-- `grep` verification confirmed `docs/agent_work/templates/plan_template.md` contains `Commit Plan`.
-- `git status --short` still shows pre-existing unrelated training-file modifications; they remain untouched.
+- `AGENTS.md` contains `Baseline-First Research Constraint`.
+- The rule explicitly rejects external task-label checkpoint routing as the final contribution.
+- The rule requires baseline limitation analysis, mechanism hypothesis, module/component/training change, smoke verification, and comparison against exact baseline/current best static result.
 
 ## Current Repository Rule Added
 
-After each completed and verified version-level code change, future agents must create one Git commit for rollback and traceability. Parameter-only changes are exempt. If GitHub push authorization is present for the task, push the commit; otherwise leave the commit local and report that GitHub push is pending approval.
-
-## Existing Unrelated Work To Preserve
-
-These files were already modified before the agent-doc workflow updates and were intentionally not changed by this task:
-
-- `llava/train/LoRASculptMIGDIS_Trainer.py`
-- `llava/train/train.py`
-- `scripts/v1_5/train/ours-train-migdis-official-issue2-iconqa.sh`
-- `scripts/v1_5/train/trainconfig_migdis_lora.sh`
+Future research iteration must frame publishable methods as baseline-compatible training or model-method improvements. Task-aware LoRA-off routing remains a diagnostic upper-bound/result, not the paper's core method story.
 
 ## Next Action
 
-For future version-level source-code changes, verify the change, update `docs/agent_work/`, commit the completed version, and push to GitHub only when authorization exists for that task.
+Before the next experiment, create a baseline limitation analysis and design a concrete module/component/training-time method that preserves a comparable inference setting.
 
 ## Blockers
 
-None for this documentation update.
+None for this instruction update.
