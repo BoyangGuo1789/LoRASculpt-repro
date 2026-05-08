@@ -1075,6 +1075,9 @@ def train(attn_implementation=None):
 
     model.config.use_cache = True
 
+    if hasattr(trainer, "apply_gate_calibration_to_lora"):
+        trainer.apply_gate_calibration_to_lora()
+
     if training_args.lora_enable:
         state_dict = get_peft_state_maybe_zero_3(
             model.named_parameters(), training_args.lora_bias
