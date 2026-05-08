@@ -1,0 +1,2 @@
+date,git_commit,run_name,stage,IconQA,OKVQA,OCRVQA,GQA,TextVQA,SourceAvg,Avg,delta_vs_exact_baseline,gate_iconqa_on,gate_source_on,stop_reason,notes
+2026-05-08,c32f085,pfg_mcqa_static_20260508_1908,answer_merge_eval,86.26,57.99,66.15,61.93,58.23,61.075,73.6675,3.61375,6316/6316,0/24624,promote,"Prompt-form gate selects LoRA for structured MCQA prompts and base for open-ended VQA prompts; official metrics computed from merged answer files; TextVQA duplicate question_id bug fixed by queue-based merge"
