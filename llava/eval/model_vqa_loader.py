@@ -102,8 +102,12 @@ def eval_model(args):
         input_ids = input_ids.to(device='cuda', non_blocking=True)
 
         with torch.inference_mode():
+            gate_metadata = None
+            if hasattr(model, "set_lora_gate_from_text"):
+                gate, gate_score = model.set_lora_gate_from_text(cur_prompt)
+                gate_metadata = {"lora_input_gate": gate, "lora_input_gate_score": gate_score}
             output_ids = model.generate(
-                input_ids,
+                inputs=input_ids,
                 images=image_tensor.to(dtype=torch.float16, device='cuda', non_blocking=True),
                 image_sizes=image_sizes,
                 do_sample=True if args.temperature > 0 else False,
@@ -121,7 +125,7 @@ def eval_model(args):
                                    "text": outputs,
                                    "answer_id": ans_id,
                                    "model_id": model_name,
-                                   "metadata": {}}) + "\n")
+                                   "metadata": gate_metadata or {}}) + "\n")
         # ans_file.flush()
     ans_file.close()
 

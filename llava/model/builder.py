@@ -81,8 +81,14 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             from peft import PeftModel
             print('Loading LoRA weights...')
             model = PeftModel.from_pretrained(model, model_path)
-            print('Merging LoRA weights...')
-            model = model.merge_and_unload()
+            from llava.model.lora_input_gate import apply_lora_input_gate, load_lora_input_gate_config
+            lora_gate_config = load_lora_input_gate_config(model_path)
+            if lora_gate_config is not None:
+                patched = apply_lora_input_gate(model, lora_gate_config)
+                print(f'Keeping LoRA unmerged with input gate; patched {patched} LoRA layers.')
+            else:
+                print('Merging LoRA weights...')
+                model = model.merge_and_unload()
             print('Model is loaded...')
         elif model_base is not None:
             # this may be mm projector only

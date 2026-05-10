@@ -1,0 +1,1 @@
+date,git_commit,run_name,stage,checkpoint,gate_train_target,gate_train_source,target_scale,source_scale,IconQA,OKVQA,OCRVQA,GQA,TextVQA,SourceAvg,Avg,delta_vs_baseline,required_gqa_for_target,promote,stop_reason,gate_stats,eval_log,notes
