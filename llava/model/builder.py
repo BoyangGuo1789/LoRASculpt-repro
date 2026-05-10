@@ -55,6 +55,12 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             tokenizer = AutoTokenizer.from_pretrained(model_base, use_fast=False)
             print('Loading LLaVA from base model...')
             model = LlavaLlamaForCausalLM.from_pretrained(model_base, low_cpu_mem_usage=True, config=lora_cfg_pretrained, **kwargs)
+            from llava.model.lora_input_gate import load_lora_input_gate_config
+            lora_gate_config = load_lora_input_gate_config(model_path)
+            base_projector_state = None
+            if lora_gate_config is not None and lora_gate_config.get("gate_projector", False):
+                from llava.model.lora_input_gate import collect_projector_base_state
+                base_projector_state = collect_projector_base_state(model)
             token_num, tokem_dim = model.lm_head.out_features, model.lm_head.in_features
             if model.lm_head.weight.shape[0] != token_num:
                 model.lm_head.weight = torch.nn.Parameter(torch.empty(token_num, tokem_dim, device=model.device, dtype=model.dtype))
@@ -81,11 +87,14 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             from peft import PeftModel
             print('Loading LoRA weights...')
             model = PeftModel.from_pretrained(model, model_path)
-            from llava.model.lora_input_gate import apply_lora_input_gate, load_lora_input_gate_config
-            lora_gate_config = load_lora_input_gate_config(model_path)
             if lora_gate_config is not None:
+                from llava.model.lora_input_gate import apply_lora_input_gate
                 patched = apply_lora_input_gate(model, lora_gate_config)
                 print(f'Keeping LoRA unmerged with input gate; patched {patched} LoRA layers.')
+                if lora_gate_config.get("gate_projector", False):
+                    from llava.model.lora_input_gate import apply_projector_input_gate
+                    projector_patched = apply_projector_input_gate(model, base_projector_state)
+                    print(f'Applied input gate to {projector_patched} mm_projector Linear layers.')
             else:
                 print('Merging LoRA weights...')
                 model = model.merge_and_unload()

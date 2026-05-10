@@ -93,6 +93,58 @@ def _gated_lora_linear_forward(self, x):
     return result.to(previous_dtype)
 
 
+def collect_projector_base_state(model):
+    base_state = {}
+    for key, value in model.state_dict().items():
+        if "mm_projector" in key and (key.endswith(".weight") or key.endswith(".bias")):
+            base_state[key] = value.detach().cpu().clone()
+    return base_state
+
+
+def _gated_projector_forward(self, x):
+    target = F.linear(x, self.weight, self.bias)
+    base_weight = self._lora_input_gate_base_weight.to(device=x.device, dtype=self.weight.dtype)
+    base_bias = None
+    if getattr(self, "_lora_input_gate_base_bias", None) is not None:
+        base_bias = self._lora_input_gate_base_bias.to(device=x.device, dtype=self.weight.dtype)
+    base = F.linear(x, base_weight, base_bias)
+    owner = getattr(self, "_lora_input_gate_owner", None)
+    gate = getattr(owner, "_lora_input_gate_value", 1.0) if owner is not None else 1.0
+    gate_tensor = torch.as_tensor(gate, device=target.device, dtype=target.dtype)
+    return base + gate_tensor * (target - base)
+
+
+def apply_projector_input_gate(model, base_projector_state):
+    if not base_projector_state:
+        return 0
+    patched = 0
+    for name, module in model.named_modules():
+        if not isinstance(module, torch.nn.Linear):
+            continue
+        if "mm_projector" not in name:
+            continue
+        matched_weight = None
+        matched_bias = None
+        for key, value in base_projector_state.items():
+            if not key.endswith(".weight"):
+                continue
+            module_key = key[: -len(".weight")]
+            if name.endswith(module_key):
+                matched_weight = value
+                bias_key = module_key + ".bias"
+                matched_bias = base_projector_state.get(bias_key)
+                break
+        if matched_weight is None:
+            continue
+        module._lora_input_gate_owner = model
+        module._lora_input_gate_base_weight = matched_weight
+        module._lora_input_gate_base_bias = matched_bias
+        module.forward = types.MethodType(_gated_projector_forward, module)
+        patched += 1
+    model._lora_input_gate_patched_projector_modules = patched
+    return patched
+
+
 def apply_lora_input_gate(model, config):
     model._lora_input_gate_config = config
     model._lora_input_gate_value = float(config.get("default_gate", config.get("target_scale", 1.0)))

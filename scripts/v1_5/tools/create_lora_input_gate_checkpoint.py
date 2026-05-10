@@ -30,6 +30,7 @@ def parse_args():
     parser.add_argument("--temperature", type=float, default=1.0)
     parser.add_argument("--target-scale", type=float, default=1.0)
     parser.add_argument("--source-scale", type=float, default=0.0)
+    parser.add_argument("--gate-projector", action="store_true")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--overwrite", action="store_true")
     return parser.parse_args()
@@ -163,6 +164,7 @@ def main():
         "temperature": args.temperature,
         "target_scale": args.target_scale,
         "source_scale": args.source_scale,
+        "gate_projector": bool(args.gate_projector),
         "default_gate": args.target_scale,
         "train_gate_stats": {
             "target_mean": sum(pos_gate) / len(pos_gate),
