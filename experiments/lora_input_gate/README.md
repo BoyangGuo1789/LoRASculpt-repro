@@ -45,3 +45,7 @@ Promote only if:
 `LoRA-IGP` full eval (`loraigp_f0_full_20260510_185410`) reaches IconQA 86.30, OKVQA 57.99, OCRVQA 66.15, GQA 61.93, TextVQA 58.22, SourceAvg 61.0725, and Avg 73.68625.
 
 Against the exact reproduced baseline Avg 70.05375, this is +3.6325 and clears the +1 target. Gate diagnostics: IconQA mean 1.0; OKVQA/OCRVQA/GQA mean near 0; TextVQA mean 0.0099.
+
+`LoRA-IGP-Ponly` full eval (`loraigp_ponly_f0_full_20260510_195626`) reaches IconQA 86.30, OKVQA 57.81, OCRVQA 66.30, GQA 61.96, TextVQA 58.35, SourceAvg 61.1050, and Avg 73.7025.
+
+This is +3.64875 over the exact reproduced baseline and slightly exceeds full LoRA+projector gating. The ablation shows that controlling the projector adaptation path is the dominant mechanism; the target LoRA can remain active for all inputs without losing the plus-one gain.
