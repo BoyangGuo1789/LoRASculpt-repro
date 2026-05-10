@@ -1,0 +1,1 @@
+date,git_commit,run_name,stage,checkpoint,target_ckpt,source_ckpt,scope,layer_band,target_gamma,source_lambda,IconQA,OKVQA,OCRVQA,GQA,TextVQA,SourceAvg,Avg,delta_vs_baseline,required_gqa_for_target,promote,stop_reason,fusion_log,eval_log,notes
