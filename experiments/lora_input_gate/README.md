@@ -33,3 +33,9 @@ Promote only if:
 - IconQA remains comparable to the static target LoRA baseline.
 - Source/general tasks recover enough for Avg >= 71.05375.
 - The saved checkpoint contains exactly one LoRA adapter plus the internal gate config.
+
+## Current Result
+
+`LoRA-IGP` full eval (`loraigp_f0_full_20260510_185410`) reaches IconQA 86.30, OKVQA 57.99, OCRVQA 66.15, GQA 61.93, TextVQA 58.22, SourceAvg 61.0725, and Avg 73.68625.
+
+Against the exact reproduced baseline Avg 70.05375, this is +3.6325 and clears the +1 target. Gate diagnostics: IconQA mean 1.0; OKVQA/OCRVQA/GQA mean near 0; TextVQA mean 0.0099.
