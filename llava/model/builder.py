@@ -90,7 +90,10 @@ def load_pretrained_model(model_path, model_base, model_name, load_8bit=False, l
             if lora_gate_config is not None:
                 from llava.model.lora_input_gate import apply_lora_input_gate
                 patched = apply_lora_input_gate(model, lora_gate_config)
-                print(f'Keeping LoRA unmerged with input gate; patched {patched} LoRA layers.')
+                if lora_gate_config.get("gate_lora", True):
+                    print(f'Keeping LoRA unmerged with input gate; patched {patched} LoRA layers.')
+                else:
+                    print('Keeping LoRA unmerged; LoRA gate disabled by config.')
                 if lora_gate_config.get("gate_projector", False):
                     from llava.model.lora_input_gate import apply_projector_input_gate
                     projector_patched = apply_projector_input_gate(model, base_projector_state)

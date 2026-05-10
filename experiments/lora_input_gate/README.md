@@ -26,6 +26,12 @@ The first implementation trains a linear bag-of-text-features gate from IconQA t
 
 This tests the evidence from `LoRA-IG`: source/general recovery stayed weak even when LoRA gate was near zero, implying that non-LoRA projector adaptation may also be over-applied to source inputs. It is still a single model path with an input-conditioned adaptation module, not external checkpoint routing.
 
+## Projector-Only Ablation
+
+`LoRA-IGP-Ponly` uses the same learned input gate for `mm_projector` adaptation but leaves the target LoRA active for all inputs. This isolates whether the source/general recovery comes from controlling projector drift versus simply turning off LoRA deltas.
+
+Use `create_lora_input_gate_checkpoint.py --gate-projector --no-gate-lora` to build this ablation checkpoint.
+
 ## Gate
 
 Promote only if:

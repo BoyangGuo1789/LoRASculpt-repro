@@ -149,6 +149,7 @@ def apply_lora_input_gate(model, config):
     model._lora_input_gate_config = config
     model._lora_input_gate_value = float(config.get("default_gate", config.get("target_scale", 1.0)))
     model._lora_input_gate_last = {}
+    model._lora_input_gate_lora_enabled = bool(config.get("gate_lora", True))
 
     def set_lora_gate_from_text(self, text):
         score = score_lora_input_gate(self._lora_input_gate_config, text)
@@ -160,10 +161,11 @@ def apply_lora_input_gate(model, config):
     model.set_lora_gate_from_text = types.MethodType(set_lora_gate_from_text, model)
 
     patched = 0
-    for module in model.modules():
-        if isinstance(module, PeftLoraLinear):
-            module._lora_input_gate_owner = model
-            module.forward = types.MethodType(_gated_lora_linear_forward, module)
-            patched += 1
+    if model._lora_input_gate_lora_enabled:
+        for module in model.modules():
+            if isinstance(module, PeftLoraLinear):
+                module._lora_input_gate_owner = model
+                module.forward = types.MethodType(_gated_lora_linear_forward, module)
+                patched += 1
     model._lora_input_gate_patched_modules = patched
     return patched
