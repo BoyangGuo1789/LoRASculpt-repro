@@ -21,6 +21,8 @@ This directory records every completed experiment version that affected the LoRA
 | `samix_delta_fusion/` | Post-hoc SA-MIX source-delta fusion into target LoRA. | Target-safe but source lift is too small. |
 | `samix_plus1/` | Direct mixed IconQA/COCO training. | Source signal hurts target too much. |
 | `mbldf_plus1/` | Multi-branch LoRA delta fusion and mask-inspired post-hoc candidates. | Target-safe variants do not recover enough source performance. |
+| `pars_lora/` | Projector-anchored rank-split LoRA inside baseline training. | Rejected after B-balanced and C-flex underperformed exact IconQA baseline. |
+| `rank_path_balanced_lora/` | Rank-path balanced LoRA mask selection that keeps every low-rank path alive before filling with global score. | Active next internal baseline-upgrade direction; smoke before full runs. |
 
 ## Best Result Snapshot
 

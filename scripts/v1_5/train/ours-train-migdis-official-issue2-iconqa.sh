@@ -49,6 +49,7 @@ echo "[LoRASculpt-MIG-DIS] grad_mix=$MIGDIS_GRAD_MIX source_margin=$MIGDIS_SOURC
 echo "[LoRASculpt-MIG-DIS] selection_mode=$MIGDIS_SELECTION_MODE tgsr_candidate_ratio=$MIGDIS_TGSR_CANDIDATE_RATIO tgsr_core_source_margin=$MIGDIS_TGSR_CORE_SOURCE_MARGIN"
 echo "[LoRASculpt-MIG-DIS] dqss_rho=$MIGDIS_DQSS_RHO dqss_aux_grad_mix=$MIGDIS_DQSS_AUX_GRAD_MIX dqss_aux_source_margin=$MIGDIS_DQSS_AUX_SOURCE_MARGIN dqss_module_scope=$MIGDIS_DQSS_MODULE_SCOPE"
 echo "[LoRASculpt-MIG-DIS] dqss_anti_collapse=$MIGDIS_DQSS_ANTI_COLLAPSE dqss_max_aux_overlap=$MIGDIS_DQSS_MAX_AUX_OVERLAP dqss_min_core_overlap=$MIGDIS_DQSS_MIN_CORE_OVERLAP"
+echo "[LoRASculpt-MIG-DIS] rpb_quota_frac=$MIGDIS_RPB_QUOTA_FRAC rpb_min_per_rank=$MIGDIS_RPB_MIN_PER_RANK"
 echo "[LoRASculpt-MIG-DIS] step_threshold=$STEP_THRESHOLD extra_args=${extra_args[*]:-}"
 
 "$DEEPSPEED_BIN" --include "$DEVICE" --master_port "$MASTER_PORT" llava/train/train_mem.py \
@@ -111,4 +112,7 @@ echo "[LoRASculpt-MIG-DIS] step_threshold=$STEP_THRESHOLD extra_args=${extra_arg
     --migdis_dqss_anti_collapse "$MIGDIS_DQSS_ANTI_COLLAPSE" \
     --migdis_dqss_max_aux_overlap "$MIGDIS_DQSS_MAX_AUX_OVERLAP" \
     --migdis_dqss_min_core_overlap "$MIGDIS_DQSS_MIN_CORE_OVERLAP" \
+    --migdis_rpb_quota_frac "$MIGDIS_RPB_QUOTA_FRAC" \
+    --migdis_rpb_min_per_rank "$MIGDIS_RPB_MIN_PER_RANK" \
+    --migdis_rpb_debug_overlap "$MIGDIS_RPB_DEBUG_OVERLAP" \
     "${extra_args[@]}"
