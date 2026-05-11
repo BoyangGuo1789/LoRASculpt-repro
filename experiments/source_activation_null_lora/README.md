@@ -46,3 +46,5 @@ Because the SAN loss is built from forward hooks on LoRA-B outputs, the source m
 - `adapter_model.bin` and `non_lora_trainables.bin` were written
 
 Two implementation-only smoke failures preceded this pass: clearing the source mask before backward broke checkpoint recomputation, and disabling checkpointing caused OOM. The accepted implementation keeps the mask alive through backward and runs with gradient checkpointing enabled.
+
+`san_ratio_l010_qkv_smoke_20260512_021036` also passed with `lambda_san=0.10`, `train_loss=0.6044726684689522`, q/k/v hook count 96, and observed SAN ratios around `0.88-0.99`. It is the backup stronger regularization variant if `lambda_san=0.05` under-regularizes source forgetting.
