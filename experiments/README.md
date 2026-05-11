@@ -6,12 +6,13 @@ This directory records every completed experiment version that affected the LoRA
 
 - Exact reproduced baseline average: `70.05375`.
 - Requested plus-one target: `71.05375`.
-- Current best recorded policy: `task_aware_lora_gate`, `Avg=73.6825`.
+- Current best archived method: `lora_input_gate/LoRA-IGP-Ponly`, `Avg=73.7025`.
 
 ## Ledgers
 
 | Directory | Purpose | Current verdict |
 |---|---|---|
+| `lora_input_gate/` | Input-conditioned internal adaptation gating; final best variant gates only the `mm_projector` adaptation path while keeping target LoRA active. | Archived best result: `Avg=73.7025`, +3.64875 over exact baseline. |
 | `task_aware_gamma/` | Dynamic task-aware routing between target LoRA and base model. | Passes plus-one target with `Avg=73.6825`; not a static checkpoint. |
 | `adadare_gamma/` | Paper-default AdaDARE-gamma post-hoc fusion on target LoRA. | Fails target gate; IconQA drops to `38.47`. |
 | `spider/` | Audited SPIDER training integration. | Blocked by DeepSpeed gradient access timing. |
@@ -25,17 +26,17 @@ This directory records every completed experiment version that affected the LoRA
 
 | Metric | Score |
 |---|---:|
-| IconQA | 86.29 |
-| OKVQA | 57.99 |
-| OCRVQA | 66.15 |
-| GQA | 61.93 |
-| TextVQA | 58.23 |
-| SourceAvg | 61.0750 |
-| Avg | 73.6825 |
+| IconQA | 86.30 |
+| OKVQA | 57.81 |
+| OCRVQA | 66.30 |
+| GQA | 61.96 |
+| TextVQA | 58.35 |
+| SourceAvg | 61.1050 |
+| Avg | 73.7025 |
 
 ## Interpretation
 
-The static checkpoint search consistently showed one failure pattern: target-preserving edits only move source scores by a small amount, while stronger source-preserving edits damage IconQA. The successful task-aware gate avoids this tradeoff by activating the target LoRA only for the target task and falling back to the base model for source/general tasks.
+The static checkpoint search consistently showed one failure pattern: target-preserving edits only move source scores by a small amount, while stronger source-preserving edits damage IconQA. The archived best result shows that a single checkpoint can clear the plus-one target by controlling the target-specific projector adaptation path, but this line is now sealed. The next research phase should use a substantially different baseline upgrade, preferably a training-time objective, LoRA-internal module, scoring rule, or regularizer rather than continuing prompt-form gating.
 
 ## Reproducibility Rule
 
