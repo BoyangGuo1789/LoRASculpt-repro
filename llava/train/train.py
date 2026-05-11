@@ -164,6 +164,11 @@ class TrainingArguments(transformers.TrainingArguments):
     tp_samix_kl_temperature: float = field(default=2.0)
     tp_samix_kl_topk: int = field(default=64)
     tp_samix_use_pcgrad: bool = field(default=False)
+    san_lambda: float = field(default=0.05)
+    san_warmup_steps: int = field(default=100)
+    san_scope: str = field(default="qkv")
+    san_log_every: int = field(default=20)
+    san_eps: float = field(default=1e-8)
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):

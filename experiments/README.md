@@ -23,6 +23,7 @@ This directory records every completed experiment version that affected the LoRA
 | `mbldf_plus1/` | Multi-branch LoRA delta fusion and mask-inspired post-hoc candidates. | Target-safe variants do not recover enough source performance. |
 | `pars_lora/` | Projector-anchored rank-split LoRA inside baseline training. | Rejected after B-balanced and C-flex underperformed exact IconQA baseline. |
 | `rank_path_balanced_lora/` | Rank-path balanced LoRA mask selection that keeps every low-rank path alive before filling with global score. | Rejected: q060 improves IconQA to `86.64`, but source tasks fall and Avg is `69.44875`. |
+| `source_activation_null_lora/` | Training-time source-activation nulling loss that keeps one always-on LoRA but penalizes its source-example delta activations. | Active next line after RPB source-forgetting failure. |
 
 ## Best Result Snapshot
 
