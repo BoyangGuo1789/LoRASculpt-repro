@@ -11,7 +11,9 @@
 : ${TRAINER_NAME:="LoRASculpt"}
 : ${DATASET_NAME:=""}
 : ${LEARNING_RATE:=2e-4}
+: ${MM_PROJECTOR_LR:=2e-5}
 : ${OUTPUT_DIR:=""}
+: ${MAX_STEPS:=""}
 
 : ${GRADIENT_ACCUMULATION_STEPS:=1}
 : ${MODEL_NAME_OR_PATH:="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"}
@@ -40,10 +42,14 @@ fi
 echo "Training data_path: $data_path"
 echo "Training image_folder: $image_folder"
 
+extra_args=()
+if [ -n "$MAX_STEPS" ]; then
+    extra_args+=(--max_steps "$MAX_STEPS")
+fi
 
 
 deepspeed --include $DEVICE --master_port $MASTER_PORT llava/train/train_mem.py \
-    --lora_enable True --lora_r $LORA_RANK --lora_alpha $LORA_ALPHA --mm_projector_lr 2e-5 \
+    --lora_enable True --lora_r $LORA_RANK --lora_alpha $LORA_ALPHA --mm_projector_lr $MM_PROJECTOR_LR \
     --deepspeed $DEEPSPEED_ZEROFILE \
     --model_name_or_path $MODEL_NAME_OR_PATH \
     --version v1 \
@@ -77,4 +83,5 @@ deepspeed --include $DEVICE --master_port $MASTER_PORT llava/train/train_mem.py 
     --dataloader_num_workers 4 \
     --lazy_preprocess True \
     --report_to none \
-    --trainer_name $TRAINER_NAME
+    --trainer_name $TRAINER_NAME \
+    "${extra_args[@]}"
