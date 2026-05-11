@@ -44,10 +44,24 @@ Then evaluate IconQA first. Full source/general eval only makes sense if IconQA 
 
 ## Current Status
 
-`rpb_q060_smoke20_20260511_223140` passed smoke:
+`rpb_q060_smoke20_20260511_223140`, `rpb_q040_smoke20_20260511_230217`, and `rpb_q080_smoke20_20260511_231434` passed smoke:
 
 - one prune at `global_step=1`;
 - active ratio A/B: `0.100005`;
 - A/B rank nonzero coverage: `1.0` across 224 modules;
-- final 20-step train loss: `0.51454`;
+- final 20-step train loss stayed finite (`0.5084` to `0.5145`);
 - checkpoint and `migdis_mask_stats.json` written.
+
+`rpb_q060_full_eval` is rejected as a source-forgetting failure:
+
+| Metric | Score |
+|---|---:|
+| IconQA | 86.64 |
+| OKVQA | 52.12 |
+| OCRVQA | 51.65 |
+| GQA | 55.82 |
+| TextVQA | 49.44 |
+| SourceAvg | 52.2575 |
+| Avg | 69.44875 |
+
+Interpretation: RPB preserved and slightly improved target IconQA, but it made source/general tasks worse than the exact reproduced baseline. This falsifies the hypothesis that rank-path coverage alone fixes LoRASculpt's cross-task forgetting. The next method should target a deeper limitation than static LoRA support geometry.

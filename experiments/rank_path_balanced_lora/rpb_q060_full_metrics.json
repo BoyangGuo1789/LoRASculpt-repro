@@ -1,0 +1,24 @@
+{
+  "run_name": "rpb_q060_full_combined",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-rpb-q060-r32",
+  "metrics": {
+    "IconQA": 86.64,
+    "OKVQA": 52.12,
+    "OCRVQA": 51.65,
+    "GQA": 55.82,
+    "TextVQA": 49.44,
+    "SourceAvg": 52.2575,
+    "Avg": 69.44875
+  },
+  "exact_reproduced_baseline_avg": 70.05375,
+  "target_avg": 71.05375,
+  "delta_vs_exact_baseline": -0.6049999999999898,
+  "delta_vs_plus_one_target": -1.6049999999999898,
+  "verdict": "fail_source_forgetting",
+  "iconqa_metrics": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/rank_path_balanced_lora/rpb_q060_iconqa/metrics.json",
+  "source_metrics": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/rank_path_balanced_lora/rpb_q060_source/metrics.json",
+  "log_files": [
+    "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/llava-v1.5-7b-lorasculpt-rpb-q060-r32_iconqa_eval_20260512_003648.log",
+    "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/llava-v1.5-7b-lorasculpt-rpb-q060-r32_source_eval_20260512_005055.log"
+  ]
+}

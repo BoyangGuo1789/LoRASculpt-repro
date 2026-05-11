@@ -22,7 +22,7 @@ This directory records every completed experiment version that affected the LoRA
 | `samix_plus1/` | Direct mixed IconQA/COCO training. | Source signal hurts target too much. |
 | `mbldf_plus1/` | Multi-branch LoRA delta fusion and mask-inspired post-hoc candidates. | Target-safe variants do not recover enough source performance. |
 | `pars_lora/` | Projector-anchored rank-split LoRA inside baseline training. | Rejected after B-balanced and C-flex underperformed exact IconQA baseline. |
-| `rank_path_balanced_lora/` | Rank-path balanced LoRA mask selection that keeps every low-rank path alive before filling with global score. | Active next internal baseline-upgrade direction; smoke before full runs. |
+| `rank_path_balanced_lora/` | Rank-path balanced LoRA mask selection that keeps every low-rank path alive before filling with global score. | Rejected: q060 improves IconQA to `86.64`, but source tasks fall and Avg is `69.44875`. |
 
 ## Best Result Snapshot
 
@@ -38,7 +38,7 @@ This directory records every completed experiment version that affected the LoRA
 
 ## Interpretation
 
-The static checkpoint search consistently showed one failure pattern: target-preserving edits only move source scores by a small amount, while stronger source-preserving edits damage IconQA. The archived best result shows that a single checkpoint can clear the plus-one target by controlling the target-specific projector adaptation path, but this line is now sealed. The next research phase should use a substantially different baseline upgrade, preferably a training-time objective, LoRA-internal module, scoring rule, or regularizer rather than continuing prompt-form gating.
+The static checkpoint search consistently showed one failure pattern: target-preserving edits only move source scores by a small amount, while stronger source-preserving edits damage IconQA. RPB adds a sharper version of this evidence: rank-path balanced support can raise IconQA (`86.64`) but still worsens source/general average. The archived best result shows that a single checkpoint can clear the plus-one target by controlling the target-specific projector adaptation path, but this line is now sealed. The next research phase should use a substantially different baseline upgrade, preferably a training-time objective, LoRA-internal module, scoring rule, or regularizer rather than continuing prompt-form gating.
 
 ## Reproducibility Rule
 
