@@ -48,3 +48,26 @@ Because the SAN loss is built from forward hooks on LoRA-B outputs, the source m
 Two implementation-only smoke failures preceded this pass: clearing the source mask before backward broke checkpoint recomputation, and disabling checkpointing caused OOM. The accepted implementation keeps the mask alive through backward and runs with gradient checkpointing enabled.
 
 `san_ratio_l010_qkv_smoke_20260512_021036` also passed with `lambda_san=0.10`, `train_loss=0.6044726684689522`, q/k/v hook count 96, and observed SAN ratios around `0.88-0.99`. It is the backup stronger regularization variant if `lambda_san=0.05` under-regularizes source forgetting.
+
+## Full Result and Rejection
+
+`san_ratio_l005_qkv_b2` completed full training:
+
+- checkpoint: `/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-san-ratio-l005-qkv-r32-b2`
+- train log: `/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/lorasculpt_san_ratio_l005_qkv_b2_full_20260512_022037.log`
+- `train_loss=0.26903682872083834`
+- active SAN ratio decreased from about `0.80` near step 50 to about `0.03` near the end
+- `adapter_model.bin` and `non_lora_trainables.bin` were written
+
+IconQA gate failed:
+
+- eval log: `/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/lorasculpt_san_ratio_l005_qkv_b2_iconqa_20260512_051220.log`
+- result: `IconQA=78.15`
+- reproduced baseline: `IconQA=86.26`
+- practical gate: `IconQA>=86.20`
+
+Decision: reject SAN-LoRA in this form. The source-activation nulling signal is effective at suppressing LoRA delta energy on source-anchor batches, but it over-constrains the target adapter and destroys IconQA. This invalidates the mechanism as currently weighted and scoped.
+
+`san_ratio_l010_qkv_b2g4` was stopped around step 1200 after the `lambda_san=0.05` target collapse, because stronger nulling was unlikely to recover IconQA and would continue consuming two GPUs for a low-probability variant.
+
+Next decision should pivot away from hard source nulling. A safer follow-up would need target-preserving constraints, such as selective low-rank subspace partitioning, target-conditioned orthogonality, or module-local regularization that does not push the entire q/k/v LoRA response toward zero on broad source activations.
