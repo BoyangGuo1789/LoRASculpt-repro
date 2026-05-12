@@ -49,6 +49,7 @@ gating, checkpoint routing, or LoRA-off evaluation.
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
 | A2a | Target teacher KL removed, OKVQA3k+COCO3k anchors unchanged | 86.78 | 59.04 | 59.85 | 56.20 | 52.93 | 57.0050 | 71.8925 | New best: +1.8388 vs reproduced baseline, +0.0125 vs target_kl=1.0. |
 | A3a | COCO anchors 1500 instead of 3000, OKVQA anchors fixed at 3000 | 86.83 | 59.06 | 58.55 | 56.57 | 52.67 | 56.7125 | 71.7713 | Above baseline +1.7175; lower than COCO3000 main by 0.1088. |
+| A4a | Freeze only 16 target ranks instead of 32, total rank64, target_kl=0.0 | 86.54 | 59.66 | 59.10 | 55.96 | 53.02 | 56.9350 | 71.7375 | Above baseline +1.6838; below A2a by 0.1550. |
 
 A2a shows that the target-frozen block is doing the main target-preservation
 work; explicit target-teacher KL is not necessary in this seed. The gain over
@@ -58,6 +59,11 @@ over-claimed as a separate method.
 A3a shows that reducing COCO anchors improves IconQA and OKVQA, but hurts
 OCRVQA/GQA/TextVQA enough that COCO3000 remains the better broad-retention
 configuration.
+
+A4a shows that relaxing the protected target subspace from 32 to 16 ranks is too
+aggressive. It improves OKVQA to 59.66, but IconQA, OCRVQA, and GQA drop enough
+that the full average trails A2a by 0.1550. This supports keeping a larger frozen
+target block for the main method.
 
 ## Full-Suite Work Items
 
@@ -71,10 +77,10 @@ configuration.
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
 | A2 | Target preservation ablation | remove or weaken target KL | done | A2a target_kl=0 full eval is the current best: Avg=71.8925. |
 | A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | partial | A3a COCO1500 full eval done: Avg=71.7713 (+1.7175 vs baseline), below COCO3000 main by 0.1088. |
-| A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | smoke passed | A4a freeze_rank16 smoke passed; full eval pending. |
+| A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | done | A4a freeze_rank16 full eval done: Avg=71.7375, below A2a; freeze32 remains main. |
 | A5 | Regularization ablation | residual L2 0/1e-6/1e-5 | pending | Tests whether residual drift control helps. |
 | R1 | Epoch robustness | evaluate checkpoints or max-step variants across training progress | pending | Mirrors paper Fig. 3 qualitatively. |
-| S1 | LoRA internal analysis | frozen/residual norm, delta energy, per-module residual movement | pending | Replaces LoRASculpt sparsity theorem plots with TFR-BS mechanism evidence. |
+| S1 | LoRA internal analysis | frozen/residual norm, delta energy, per-module residual movement | done | `s1_lora_delta_summary.json` confirms frozen-rank drift is 0.0 and residual ranks carry the learned movement. |
 
 ## Priority
 
@@ -82,11 +88,15 @@ configuration.
    over target_kl=1.0 is only +0.0125.
 2. `A3a` COCO1500 is complete; COCO3000 remains the better broad-retention
    configuration.
-3. Next training ablations should prioritize `A4` frozen-rank and `M4` rank
-   scaling, because these test whether target-frozen capacity allocation is the
-   causal mechanism.
-4. Add `S1` internal norm/delta analysis before writing the method section.
-5. Train/evaluate the strict COCO-target analogue only after confirming whether
+3. `A4a` indicates freeze_rank16 is not enough target protection; keep
+   freeze_rank32 for the main method unless a larger total-rank variant restores
+   IconQA/GQA.
+4. Next training ablations should prioritize `M4` rank scaling and `A5` residual
+   regularization, because they test whether extra residual capacity or smaller
+   residual drift improves the target/source tradeoff.
+5. `S1` internal norm/delta analysis is now recorded; use it as method evidence
+   before writing the method section.
+6. Train/evaluate the strict COCO-target analogue only after confirming whether
    the baseline COCO LoRASculpt checkpoint is already available or must be
    reproduced from scratch.
 

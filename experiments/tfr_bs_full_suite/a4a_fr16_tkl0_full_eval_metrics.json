@@ -1,0 +1,50 @@
+{
+  "date": "2026-05-13",
+  "category": "A4a",
+  "run_name": "tfr_bs_ok3k_coco3k_fr16_tkl0_full_no2_20260512_230610",
+  "stage": "full_eval",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-fr16-sw1-tkl0-full-no2-20260512_230610",
+  "target_task": "IconQA",
+  "train_mix": "IconQA10000+OKVQA3000+COCO3000",
+  "rank": 64,
+  "freeze_rank": 16,
+  "okvqa_samples": 3000,
+  "coco_samples": 3000,
+  "lambda_target_kl": 0.0,
+  "residual_l2": 0.0,
+  "metrics": {
+    "IconQA": 86.54,
+    "OKVQA": 59.66,
+    "OCRVQA": 59.1,
+    "GQA": 55.96,
+    "TextVQA": 53.02,
+    "SourceAvg": 56.935,
+    "Avg": 71.73750000000001
+  },
+  "delta_vs_reproduced_baseline": 1.6837500000000176,
+  "verdict": "success_above_plus1_below_current_best",
+  "train_loss": 0.48970777774509044,
+  "adapter_diff": {
+    "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-fr16-sw1-tkl0-full-no2-20260512_230610/adapter_model.bin",
+    "init_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-init-target-r64-a128/adapter_model.bin",
+    "checked_lora_tensors": 448,
+    "freeze_rank": 16,
+    "frozen_values": 39976960,
+    "residual_values": 119930880,
+    "max_frozen_abs_diff": 0.0,
+    "max_residual_abs_diff": 0.01336669921875
+  },
+  "logs": {
+    "train": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_fr16_tkl0_full_no2_20260512_230610.log",
+    "iconqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_fr16_tkl0_iconqa_20260513_010530.log",
+    "okvqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_fr16_tkl0_okvqa_20260513_011350.log",
+    "source_remainder": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_fr16_tkl0_source_remainder_20260513_012134.log"
+  },
+  "eval_run_names": {
+    "iconqa": "tfr_bs_ok3k_coco3k_fr16_tkl0_iconqa_20260513_010530",
+    "okvqa": "tfr_bs_ok3k_coco3k_fr16_tkl0_okvqa_20260513_011350",
+    "source_remainder": "tfr_bs_ok3k_coco3k_fr16_tkl0_source_remainder_20260513_012134"
+  },
+  "gpu_policy": "Launched on GPUs 0,1,4,6 to avoid GPU 2 fan issue.",
+  "git_commit_before_record": "93a42e0754f1065742fbc42cccb44ecfd779bde9"
+}

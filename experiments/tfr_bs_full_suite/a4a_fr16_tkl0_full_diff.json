@@ -1,0 +1,10 @@
+{
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-fr16-sw1-tkl0-full-no2-20260512_230610/adapter_model.bin",
+  "init_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-init-target-r64-a128/adapter_model.bin",
+  "checked_lora_tensors": 448,
+  "freeze_rank": 16,
+  "frozen_values": 39976960,
+  "residual_values": 119930880,
+  "max_frozen_abs_diff": 0.0,
+  "max_residual_abs_diff": 0.01336669921875
+}
