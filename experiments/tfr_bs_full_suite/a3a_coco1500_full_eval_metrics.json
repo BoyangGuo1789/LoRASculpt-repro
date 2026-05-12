@@ -1,0 +1,24 @@
+{
+  "run_name": "tfr_bs_ok3k_coco1500_full_20260512_164743",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco1500-sw1-tkl1-full-20260512_164743",
+  "category": "A3a",
+  "stage": "full_eval",
+  "metrics": {
+    "IconQA": 86.83,
+    "OKVQA": 59.06,
+    "OCRVQA": 58.55,
+    "GQA": 56.57,
+    "TextVQA": 52.67,
+    "SourceAvg": 56.7125,
+    "Avg": 71.7713,
+    "delta_vs_reproduced_baseline": 1.7175,
+    "delta_vs_main_tfr_bs": -0.10875
+  },
+  "logs": {
+    "train": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco1500_full_20260512_164743.log",
+    "iconqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco1500_iconqa_20260512_175656.log",
+    "okvqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco1500_okvqa_20260512_180601.log",
+    "source_remainder": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco1500_source_remainder_20260512_181339.log"
+  },
+  "verdict": "success_above_plus1_below_main"
+}
