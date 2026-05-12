@@ -71,7 +71,7 @@ configuration.
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
 | A2 | Target preservation ablation | remove or weaken target KL | done | A2a target_kl=0 full eval is the current best: Avg=71.8925. |
 | A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | partial | A3a COCO1500 full eval done: Avg=71.7713 (+1.7175 vs baseline), below COCO3000 main by 0.1088. |
-| A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | pending | Tests target block protection strength. |
+| A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | smoke passed | A4a freeze_rank16 smoke passed; full eval pending. |
 | A5 | Regularization ablation | residual L2 0/1e-6/1e-5 | pending | Tests whether residual drift control helps. |
 | R1 | Epoch robustness | evaluate checkpoints or max-step variants across training progress | pending | Mirrors paper Fig. 3 qualitatively. |
 | S1 | LoRA internal analysis | frozen/residual norm, delta energy, per-module residual movement | pending | Replaces LoRASculpt sparsity theorem plots with TFR-BS mechanism evidence. |

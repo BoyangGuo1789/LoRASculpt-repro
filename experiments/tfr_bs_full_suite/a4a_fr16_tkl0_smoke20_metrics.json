@@ -1,0 +1,30 @@
+{
+  "run_name": "tfr_bs_ok3k_coco3k_fr16_tkl0_smoke20_20260512_224316",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-fr16-sw1-tkl0-smoke20-20260512_224316-20260512_224316-smoke",
+  "stage": "smoke20",
+  "method": "TFR-BS freeze_rank=16, target_kl=0.0",
+  "training": {
+    "steps": 20,
+    "train_loss": 0.8744342505931855,
+    "rank": 64,
+    "freeze_rank": 16,
+    "okvqa_samples": 3000,
+    "coco_samples": 3000,
+    "lambda_target_kl": 0.0,
+    "lambda_source_kl": 0.0,
+    "residual_l2": 0.0
+  },
+  "gradient_masks": {
+    "hooks": 448,
+    "freeze_rank": 16,
+    "frozen_values": 39976960,
+    "residual_trainable_values": 119930880
+  },
+  "adapter_check": {
+    "checked_lora_tensors": 448,
+    "max_frozen_abs_diff": 0.0,
+    "max_residual_abs_diff": 0.000553131103515625
+  },
+  "log": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_fr16_tkl0_smoke20_20260512_224316.log",
+  "verdict": "smoke_passed"
+}
