@@ -31,6 +31,8 @@ For this project, the exact reproduced baseline for the active IconQA setting is
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | TFR-BS | IconQA target, rank64 total, freeze32/residual32, OKVQA3k+COCO3k anchors | 86.56 | 58.64 | 60.25 | 56.78 | 53.13 | 57.2000 | 71.8800 | +1.82625 |
 
+COCO-Caption probe for the same checkpoint: CIDEr=1.2138 (not a COCO-target fine-tune).
+
 This result keeps one checkpoint and one always-on PEFT adapter. It is not task
 gating, checkpoint routing, or LoRA-off evaluation.
 
@@ -39,7 +41,7 @@ gating, checkpoint routing, or LoRA-off evaluation.
 | ID | Baseline paper category | TFR-BS experiment | Status | Notes |
 |---|---|---|---|---|
 | M1 | Main IconQA target table | Reproduced baseline vs TFR-BS on IconQA + four source tasks | done | Full metrics already recorded. |
-| M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | running | Low-cost probe; not a COCO-target fine-tune. |
+| M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | done | Probe CIDEr=1.2138; this is not a COCO-target fine-tune. |
 | M3 | COCO-Caption downstream adaptation | Train a COCO-target TFR-BS analogue if a COCO LoRASculpt target checkpoint exists or can be trained | pending | Needed for strict Table-1 parity. |
 | M4 | Rank scaling | Compare total rank/residual capacity variants | pending | Proposed: r48 freeze32, r64 freeze32, r96 freeze32. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | pending | Use `MM_PROJECTOR_LR=0` mainline vs controlled variants. |
