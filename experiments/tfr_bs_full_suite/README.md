@@ -57,7 +57,7 @@ current full-average checkpoint.
 | M4 | Rank scaling | Compare total rank/residual capacity variants | pending | Proposed: r48 freeze32, r64 freeze32, r96 freeze32. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | pending | Use `MM_PROJECTOR_LR=0` mainline vs controlled variants. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
-| A2 | Target preservation ablation | remove or weaken target KL | pending | Tests whether target-teacher KL is needed. |
+| A2 | Target preservation ablation | remove or weaken target KL | partial | A2a target_kl=0 smoke passed; full evaluation pending. |
 | A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | partial | A3a COCO1500 full eval done: Avg=71.7713 (+1.7175 vs baseline), below COCO3000 main by 0.1088. |
 | A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | pending | Tests target block protection strength. |
 | A5 | Regularization ablation | residual L2 0/1e-6/1e-5 | pending | Tests whether residual drift control helps. |
