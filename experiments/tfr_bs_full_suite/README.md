@@ -25,13 +25,19 @@ For this project, the exact reproduced baseline for the active IconQA setting is
 |---|---:|---:|---:|---:|---:|---:|---:|
 | LoRASculpt reproduced baseline | 86.26 | 52.71 | 54.70 | 56.34 | 51.64 | 53.8475 | 70.05375 |
 
-## Current Main Result
+## Current Best Full Result
 
 | Method | Setting | IconQA | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Avg | Delta vs reproduced baseline |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| TFR-BS | IconQA target, rank64 total, freeze32/residual32, OKVQA3k+COCO3k anchors | 86.56 | 58.64 | 60.25 | 56.78 | 53.13 | 57.2000 | 71.8800 | +1.82625 |
+| TFR-BS no target KL | IconQA target, rank64 total, freeze32/residual32, OKVQA3k+COCO3k anchors, target_kl=0.0 | 86.78 | 59.04 | 59.85 | 56.20 | 52.93 | 57.0050 | 71.8925 | +1.83875 |
 
-COCO-Caption probe for the same checkpoint: CIDEr=1.2138 (not a COCO-target fine-tune).
+Previous target_kl=1.0 main configuration: IconQA=86.56, SourceAvg=57.2000,
+Avg=71.8800. The no-KL ablation is only +0.0125 higher in full average, so both
+variants should be treated as close until another seed or rank check confirms
+the margin.
+
+COCO-Caption probe for the target_kl=1.0 checkpoint: CIDEr=1.2138 (not a
+COCO-target fine-tune).
 
 This result keeps one checkpoint and one always-on PEFT adapter. It is not task
 gating, checkpoint routing, or LoRA-off evaluation.
@@ -41,11 +47,17 @@ gating, checkpoint routing, or LoRA-off evaluation.
 
 | ID | Change | IconQA | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Avg | Verdict |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
+| A2a | Target teacher KL removed, OKVQA3k+COCO3k anchors unchanged | 86.78 | 59.04 | 59.85 | 56.20 | 52.93 | 57.0050 | 71.8925 | New best: +1.8388 vs reproduced baseline, +0.0125 vs target_kl=1.0. |
 | A3a | COCO anchors 1500 instead of 3000, OKVQA anchors fixed at 3000 | 86.83 | 59.06 | 58.55 | 56.57 | 52.67 | 56.7125 | 71.7713 | Above baseline +1.7175; lower than COCO3000 main by 0.1088. |
 
+A2a shows that the target-frozen block is doing the main target-preservation
+work; explicit target-teacher KL is not necessary in this seed. The gain over
+target_kl=1.0 is tiny, so it is useful as a component ablation but should not be
+over-claimed as a separate method.
+
 A3a shows that reducing COCO anchors improves IconQA and OKVQA, but hurts
-OCRVQA/GQA/TextVQA enough that the COCO3000 main configuration remains the best
-current full-average checkpoint.
+OCRVQA/GQA/TextVQA enough that COCO3000 remains the better broad-retention
+configuration.
 
 ## Full-Suite Work Items
 
@@ -57,7 +69,7 @@ current full-average checkpoint.
 | M4 | Rank scaling | Compare total rank/residual capacity variants | pending | Proposed: r48 freeze32, r64 freeze32, r96 freeze32. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | pending | Use `MM_PROJECTOR_LR=0` mainline vs controlled variants. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
-| A2 | Target preservation ablation | remove or weaken target KL | partial | A2a target_kl=0 smoke passed; full evaluation pending. |
+| A2 | Target preservation ablation | remove or weaken target KL | done | A2a target_kl=0 full eval is the current best: Avg=71.8925. |
 | A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | partial | A3a COCO1500 full eval done: Avg=71.7713 (+1.7175 vs baseline), below COCO3000 main by 0.1088. |
 | A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | pending | Tests target block protection strength. |
 | A5 | Regularization ablation | residual L2 0/1e-6/1e-5 | pending | Tests whether residual drift control helps. |
@@ -66,10 +78,14 @@ current full-average checkpoint.
 
 ## Priority
 
-1. `M2` COCO-Caption probe is complete for the current successful checkpoint.
-2. `A3a` COCO1500 is complete; COCO3000 remains the main configuration.
-3. Run `A2`: target KL is the cleanest target-preservation component ablation.
-4. Run `A4` or `A5` only if the first two ablations leave the mechanism unclear.
+1. `A2a` target_kl=0 is the current best full-average checkpoint, but the margin
+   over target_kl=1.0 is only +0.0125.
+2. `A3a` COCO1500 is complete; COCO3000 remains the better broad-retention
+   configuration.
+3. Next training ablations should prioritize `A4` frozen-rank and `M4` rank
+   scaling, because these test whether target-frozen capacity allocation is the
+   causal mechanism.
+4. Add `S1` internal norm/delta analysis before writing the method section.
 5. Train/evaluate the strict COCO-target analogue only after confirming whether
    the baseline COCO LoRASculpt checkpoint is already available or must be
    reproduced from scratch.

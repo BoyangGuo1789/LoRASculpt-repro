@@ -1,0 +1,39 @@
+{
+  "run_name": "tfr_bs_ok3k_coco3k_tkl0_full_20260512_190205",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-sw1-tkl0-full-20260512_190205",
+  "stage": "full_eval",
+  "method": "TFR-BS with target_kl=0.0",
+  "metrics": {
+    "IconQA": 86.78,
+    "OKVQA": 59.04,
+    "OCRVQA": 59.85,
+    "GQA": 56.20,
+    "TextVQA": 52.93,
+    "SourceAvg": 57.0050,
+    "Avg": 71.8925,
+    "delta_vs_reproduced_baseline": 1.83875,
+    "delta_vs_tfr_bs_target_kl_1": 0.0125
+  },
+  "training": {
+    "train_loss": 0.4910494888378307,
+    "rank": 64,
+    "freeze_rank": 32,
+    "okvqa_samples": 3000,
+    "coco_samples": 3000,
+    "lambda_target_kl": 0.0,
+    "lambda_source_kl": 0.0,
+    "residual_l2": 0.0
+  },
+  "adapter_check": {
+    "adapter_keys": 448,
+    "frozen_diff": 0.0,
+    "residual_diff": 0.011474609375
+  },
+  "logs": {
+    "train": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_tkl0_full_20260512_190205.log",
+    "iconqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_tkl0_iconqa_20260512_215117.log",
+    "okvqa": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_tkl0_okvqa_20260512_220044.log",
+    "source_remainder": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_tkl0_source_remainder_20260512_220812.log"
+  },
+  "verdict": "new_best_success_above_plus1"
+}
