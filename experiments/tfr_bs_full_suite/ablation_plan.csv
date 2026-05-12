@@ -1,0 +1,9 @@
+id,priority,experiment,baseline_category,hypothesis,command_status,success_gate,notes
+A3a,1,COCO_SAMPLES=1500 with OKVQA_SAMPLES=3000,source-anchor ablation,Too much or too little COCO changes broad source retention,pending,IconQA>=86.20 and Avg>=71.05375,Compare to COCO=0 and COCO=3000.
+A3b,1,COCO_SAMPLES=0 with OKVQA_SAMPLES=3000,source-anchor ablation,COCO anchors are responsible for OCRVQA/GQA/TextVQA recovery,done_existing,Existing TFR OKVQA-only Avg=70.7050,Recorded in target_frozen_residual_lora.
+A2a,2,LAMBDA_TARGET_KL=0.0,target preservation ablation,Target-teacher KL prevents residual branch from perturbing IconQA,pending,IconQA drop should be larger without KL,Run smoke before full.
+A2b,2,LAMBDA_TARGET_KL=0.5,target preservation ablation,Intermediate KL may improve source while preserving target,pending,Avg and IconQA gate,Optional if no-KL is informative.
+A4a,3,FREEZE_RANK=16 with total rank64,frozen-rank ablation,Partially unfreezing target block tests rank protection necessity,pending,IconQA>=86.20,May damage target.
+A5a,3,RESIDUAL_L2=1e-6,residual regularization ablation,Small residual norm control may reduce source drift,pending,Avg improvement or stability,Run only if source/target tradeoff remains unclear.
+R1a,3,max_steps curve 250/500/1000,epoch robustness,Residual branch should preserve target across training progress,pending,Stable IconQA and rising source,Can use partial eval gates.
+S1a,2,per-module frozen/residual norm analysis,internal analysis,TFR-BS gain should correspond to residual movement without target-rank drift,pending,frozen_diff=0 and meaningful residual norms,No training required.
