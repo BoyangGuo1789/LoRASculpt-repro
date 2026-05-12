@@ -111,6 +111,7 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_dropout: float = 0.05
     lora_weight_path: str = ""
     lora_bias: str = "none"
+    load_lora_start_non_lora: bool = field(default=False)
     mm_projector_lr: Optional[float] = None
     group_by_modality_length: bool = field(default=False)
     ids_enable: bool = field(default=False)
@@ -164,6 +165,9 @@ class TrainingArguments(transformers.TrainingArguments):
     tp_samix_kl_temperature: float = field(default=2.0)
     tp_samix_kl_topk: int = field(default=64)
     tp_samix_use_pcgrad: bool = field(default=False)
+    tfr_freeze_rank: int = field(default=0)
+    tfr_residual_l2: float = field(default=0.0)
+    tfr_log_every: int = field(default=20)
     san_lambda: float = field(default=0.05)
     san_warmup_steps: int = field(default=100)
     san_scope: str = field(default="qkv")
@@ -799,7 +803,8 @@ class LazySupervisedDataset(Dataset):
             crop_size = self.data_args.image_processor.crop_size
             data_dict['image'] = torch.zeros(3, crop_size['height'], crop_size['width'])
         if 'samix_source' in self.list_data_dict[i]:
-            data_dict['samix_is_source'] = int(self.list_data_dict[i].get('samix_source') == 'coco')
+            source_name = str(self.list_data_dict[i].get('samix_source', '')).lower()
+            data_dict['samix_is_source'] = int(source_name not in ('', 'iconqa', 'target'))
         return data_dict
 
 
@@ -870,6 +875,21 @@ def _load_lora_adapter_state(model, path: Optional[str], adapter_name: str = "de
     state_dict = torch.load(state_path, map_location="cpu")
     set_peft_model_state_dict(model, state_dict, adapter_name=adapter_name)
     rank0_print(f"Loaded LoRA adapter '{adapter_name}' from {state_path}")
+
+
+def _load_lora_start_non_lora_state(model, path: Optional[str], enabled: bool = False):
+    if not enabled or not path or not os.path.isdir(path):
+        return
+    state_path = os.path.join(path, "non_lora_trainables.bin")
+    if not os.path.isfile(state_path):
+        rank0_print(f"Requested non-LoRA start state but file is absent: {state_path}")
+        return
+    state_dict = torch.load(state_path, map_location="cpu")
+    missing, unexpected = model.load_state_dict(state_dict, strict=False)
+    rank0_print(
+        f"Loaded non-LoRA trainables from {state_path}; "
+        f"missing={len(missing)} unexpected={len(unexpected)}"
+    )
 
 
 def _freeze_lora_adapter(model, adapter_name: str):
@@ -969,6 +989,11 @@ def train(attn_implementation=None):
         rank0_print("Adding LoRA adapters...")
         model = get_peft_model(model, lora_config)
         _load_lora_adapter_state(model, training_args.lora_start_path, adapter_name="default")
+        _load_lora_start_non_lora_state(
+            model,
+            training_args.lora_start_path,
+            enabled=training_args.load_lora_start_non_lora,
+        )
         if training_args.tp_samix_teacher_lora_path:
             rank0_print("Adding frozen TP-SA-MIX teacher adapter...")
             model.add_adapter("teacher", lora_config)
@@ -1088,6 +1113,8 @@ def train(attn_implementation=None):
         trainer.train(resume_from_checkpoint=True)
     else:
         trainer.train()
+    if hasattr(trainer, "restore_tfr_frozen_blocks"):
+        trainer.restore_tfr_frozen_blocks(model)
     trainer.save_state()
 
     model.config.use_cache = True

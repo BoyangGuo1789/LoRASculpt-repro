@@ -1,0 +1,55 @@
+# Target-Frozen Residual LoRA
+
+TFR-LoRA is the next internal baseline-upgrade direction after static residual
+expansion. It keeps the reproduced IconQA LoRASculpt adapter as a frozen target
+block and appends new residual ranks inside the same LoRA matrices.
+
+At inference there is still one PEFT adapter and LoRA is always active:
+
+```text
+Delta(x) = B_t A_t x + B_r A_r x
+```
+
+The first block `(A_t, B_t)` is copied from the target LoRASculpt baseline and
+its gradients are masked to zero. The residual block `(A_r, B_r)` starts as a
+zero-function branch and is trained on an IconQA + OKVQA mix with target-teacher
+KL. The intended mechanism is to prevent source/general corrections from
+overwriting the baseline target subspace while still allowing a learned LoRA
+component to recover source capability.
+
+This is not task gating, checkpoint routing, or evaluation-time LoRA disabling.
+The comparison target remains the exact reproduced LoRASculpt baseline:
+
+| Method | IconQA | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Avg |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| LoRASculpt reproduced baseline | 86.26 | 52.71 | 54.70 | 56.34 | 51.64 | 53.8475 | 70.05375 |
+
+Success threshold: `Avg >= 71.05375`.
+
+## Gate
+
+1. Build a rank-64 initialization whose first 32 ranks exactly reproduce the
+   target adapter and whose residual branch has zero functional contribution.
+2. Smoke train for 20 steps and verify finite loss plus TFR gradient-mask logs.
+3. Run IconQA gate first. Continue only if IconQA is at least 86.20.
+4. Run OKVQA gate. Continue to OCRVQA/TextVQA/GQA only if the source lift is
+   plausibly large enough for the +1 average target.
+
+## 2026-05-12 Smoke
+
+The fixed smoke run `tfr_okvqa_s3000_sw1_tkl1_smoke20fastfix_20260512_103753`
+passed the implementation gate:
+
+- rank-64 target initialization loaded;
+- target non-LoRA trainables loaded from the reproduced baseline checkpoint;
+- 448 LoRA tensors received gradient masks;
+- frozen target-block values: `79,953,920`;
+- residual trainable values: `79,953,920`;
+- train loss: `0.50484`;
+- post-train target-block max absolute diff: `0.0`;
+- post-train residual-block max absolute diff: `5.455e-4`.
+
+The first smoke attempt showed that gradient masks alone were insufficient under
+the optimizer path, so TFR now restores frozen slices before each forward pass
+and again before final adapter saving. The reference slices live on the same
+device as the LoRA parameters to avoid per-step CPU-to-GPU copies.
