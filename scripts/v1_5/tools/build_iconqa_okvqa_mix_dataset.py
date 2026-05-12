@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Build a deterministic IconQA + OKVQA mixed SFT dataset for TFR-LoRA."""
+"""Build a deterministic IconQA + source mixed SFT dataset for TFR-LoRA."""
 
 import argparse
 import copy
@@ -44,6 +44,13 @@ def normalize_okvqa_image(path):
     return os.path.join("coco", "train2014", path).replace("\\", "/")
 
 
+def normalize_coco_image(path):
+    path = path.lstrip("/")
+    if path.startswith("coco/"):
+        return path
+    return os.path.join("coco", path).replace("\\", "/")
+
+
 def normalize_sample(sample, source):
     out = copy.deepcopy(sample)
     if "image" not in out:
@@ -54,6 +61,8 @@ def normalize_sample(sample, source):
         out["image"] = normalize_iconqa_image(out["image"])
     elif source == "okvqa":
         out["image"] = normalize_okvqa_image(out["image"])
+    elif source == "coco":
+        out["image"] = normalize_coco_image(out["image"])
     else:
         raise ValueError(source)
     out["samix_source"] = source
@@ -71,10 +80,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--iconqa-json", required=True)
     parser.add_argument("--okvqa-json", required=True)
+    parser.add_argument("--coco-json", default="")
     parser.add_argument("--output-json", required=True)
     parser.add_argument("--manifest-json", required=True)
     parser.add_argument("--data-root", required=True)
     parser.add_argument("--okvqa-samples", type=int, default=3000)
+    parser.add_argument("--coco-samples", type=int, default=0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--shuffle-seed", type=int, default=None)
     parser.add_argument("--check-images", action="store_true")
@@ -83,8 +94,14 @@ def main():
     iconqa = [normalize_sample(x, "iconqa") for x in load_json(args.iconqa_json)]
     okvqa = [normalize_sample(x, "okvqa") for x in load_json(args.okvqa_json)]
     okvqa = maybe_sample(okvqa, args.okvqa_samples, args.seed)
+    coco = []
+    if args.coco_samples > 0:
+        if not args.coco_json:
+            raise ValueError("--coco-json is required when --coco-samples > 0")
+        coco = [normalize_sample(x, "coco") for x in load_json(args.coco_json)]
+        coco = maybe_sample(coco, args.coco_samples, args.seed + 1009)
 
-    mixed = iconqa + okvqa
+    mixed = iconqa + okvqa + coco
     shuffle_seed = args.seed if args.shuffle_seed is None else args.shuffle_seed
     random.Random(shuffle_seed).shuffle(mixed)
 
@@ -104,9 +121,11 @@ def main():
         "method": "TFR-LoRA data mix",
         "iconqa_json": args.iconqa_json,
         "okvqa_json": args.okvqa_json,
+        "coco_json": args.coco_json or None,
         "output_json": args.output_json,
         "data_root": args.data_root,
         "okvqa_samples": args.okvqa_samples,
+        "coco_samples": args.coco_samples,
         "seed": args.seed,
         "shuffle_seed": shuffle_seed,
         "counts": dict(counts),

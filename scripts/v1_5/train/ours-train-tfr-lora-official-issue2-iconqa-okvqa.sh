@@ -30,10 +30,20 @@ OFFICIAL_JSON_ROOT=${OFFICIAL_JSON_ROOT:-$ROOT/downloads/official_issue2/extract
 ICONQA_JSON=${ICONQA_JSON:-$OFFICIAL_JSON_ROOT/IconQA_txt/iconqa_txt-train.json}
 OKVQA_JSON=${OKVQA_JSON:-$ROOT/data/source_adapter/okvqa_train_all_seed42.json}
 OKVQA_SAMPLES=${OKVQA_SAMPLES:-3000}
+COCO_JSON=${COCO_JSON:-$ROOT/data/coco/coco-train.json}
+COCO_SAMPLES=${COCO_SAMPLES:-0}
 TFR_SEED=${TFR_SEED:-42}
 TFR_DATA_DIR=${TFR_DATA_DIR:-$ROOT/data/tfr_lora}
-MIX_JSON=${MIX_JSON:-$TFR_DATA_DIR/iconqa_okvqa_s${OKVQA_SAMPLES}_seed${TFR_SEED}.json}
-MIX_MANIFEST=${MIX_MANIFEST:-$TFR_DATA_DIR/iconqa_okvqa_s${OKVQA_SAMPLES}_seed${TFR_SEED}.manifest.json}
+if [ -z "${MIX_JSON:-}" ]; then
+    if [ "$COCO_SAMPLES" -gt 0 ]; then
+        MIX_JSON=$TFR_DATA_DIR/iconqa_okvqa_s${OKVQA_SAMPLES}_coco_s${COCO_SAMPLES}_seed${TFR_SEED}.json
+    else
+        MIX_JSON=$TFR_DATA_DIR/iconqa_okvqa_s${OKVQA_SAMPLES}_seed${TFR_SEED}.json
+    fi
+fi
+if [ -z "${MIX_MANIFEST:-}" ]; then
+    MIX_MANIFEST=${MIX_JSON%.json}.manifest.json
+fi
 REBUILD_MIX=${REBUILD_MIX:-0}
 
 BASELINE_LORA=${BASELINE_LORA:-$ROOT/checkpoints/llava-v1.5-7b-iconqa_txt_official_issue2-LoRASculpt-lora-r32-a64-e3-CMRLAMBDA1e-3-OMEGA1.0-RATIO0.1-gamma090}
@@ -77,16 +87,22 @@ if [ ! -f "$OKVQA_JSON" ]; then
 fi
 
 if [[ "$REBUILD_MIX" == "1" || ! -f "$MIX_JSON" ]]; then
-    "$PYTHON_BIN" scripts/v1_5/tools/build_iconqa_okvqa_mix_dataset.py \
+    mix_args=(
         --iconqa-json "$ICONQA_JSON" \
         --okvqa-json "$OKVQA_JSON" \
         --output-json "$MIX_JSON" \
         --manifest-json "$MIX_MANIFEST" \
         --data-root "$ROOT/data" \
         --okvqa-samples "$OKVQA_SAMPLES" \
+        --coco-samples "$COCO_SAMPLES" \
         --seed "$TFR_SEED" \
         --shuffle-seed "$TFR_SEED" \
         --check-images
+    )
+    if [ "$COCO_SAMPLES" -gt 0 ]; then
+        mix_args+=(--coco-json "$COCO_JSON")
+    fi
+    "$PYTHON_BIN" scripts/v1_5/tools/build_iconqa_okvqa_mix_dataset.py "${mix_args[@]}"
 fi
 
 if [ ! -f "$INIT_LORA/adapter_model.bin" ]; then
@@ -115,7 +131,7 @@ echo "[TFR-LoRA] output_dir=$OUTPUT_DIR"
 echo "[TFR-LoRA] baseline_lora=$BASELINE_LORA"
 echo "[TFR-LoRA] init_lora=$INIT_LORA"
 echo "[TFR-LoRA] trainer=$TRAINER_NAME rank=$LORA_RANK alpha=$LORA_ALPHA freeze_rank=$FREEZE_RANK"
-echo "[TFR-LoRA] okvqa_samples=$OKVQA_SAMPLES seed=$TFR_SEED"
+echo "[TFR-LoRA] okvqa_samples=$OKVQA_SAMPLES coco_samples=$COCO_SAMPLES seed=$TFR_SEED"
 echo "[TFR-LoRA] lr=$LEARNING_RATE mm_projector_lr=$MM_PROJECTOR_LR source_weight=$SOURCE_WEIGHT target_kl=$LAMBDA_TARGET_KL source_kl=$LAMBDA_SOURCE_KL residual_l2=$RESIDUAL_L2 pcgrad=$USE_PCGRAD_ARG"
 
 "$DEEPSPEED_BIN" --include "$DEVICE" --master_port "$MASTER_PORT" llava/train/train_mem.py \

@@ -80,3 +80,31 @@ it loses `0.50` on OCRVQA and `0.73` on GQA. The next variant should keep the
 target-frozen residual structure while training the residual branch on a broader
 source mixture or adding a source-balance constraint so that the OKVQA gain does
 not come at the expense of other source/general datasets.
+
+## 2026-05-12 Balanced-Source Smoke
+
+TFR-BS keeps the same target-frozen residual adapter but extends the residual
+training mix from IconQA + OKVQA to IconQA + OKVQA + COCO caption source
+anchors. The hypothesis is that COCO anchors may recover broad visual-language
+coverage without changing inference: one model, one adapter, LoRA always on.
+
+Smoke run `tfr_bs_ok3k_coco3k_smoke20_20260512_124658` used:
+
+- IconQA: `10,000`;
+- OKVQA train samples: `3,000`;
+- COCO caption samples: `3,000`;
+- rank/alpha/freeze: `64/128/32`;
+- source weight: `1.0`;
+- target KL: `1.0`;
+- train loss: `0.98270`.
+
+Adapter verification passed:
+
+- root adapter keys: `448`;
+- teacher keys in root adapter: `0`;
+- target-block max absolute diff vs init: `0.0`;
+- residual-block max absolute diff vs init: `5.493e-4`.
+
+This smoke only verifies implementation and target-rank freezing. It does not
+yet establish metric value; the next gate is a full TFR-BS run followed by
+IconQA and OKVQA evaluation.
