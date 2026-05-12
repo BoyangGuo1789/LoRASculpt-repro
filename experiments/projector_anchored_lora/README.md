@@ -42,4 +42,18 @@ If projector drift is the dominant source/general damage mechanism, freezing the
 - `train_loss=0.5181412443518638`
 - `adapter_model.bin` and `non_lora_trainables.bin` were written
 
-Next step: full train with the same projector-anchored setting, then IconQA gate before source/general evaluation.
+## Full Result
+
+`pal_mm0_full_eval_20260512_073000` completed with one static checkpoint and always-on LoRA:
+
+| Metric | Score |
+|---|---:|
+| IconQA | 86.56 |
+| OKVQA | 52.58 |
+| OCRVQA | 55.10 |
+| GQA | 56.43 |
+| TextVQA | 51.41 |
+| SourceAvg | 53.88 |
+| Avg | 70.22 |
+
+Verdict: rejected for the `baseline + 1` target. PAL improves IconQA over the reproduced baseline and recovers a small amount of OCRVQA/GQA, but the source average remains effectively baseline-level. This falsifies the narrow hypothesis that projector freezing alone solves source/general forgetting. The next method should target LoRA-internal interference directly rather than only projector drift.
