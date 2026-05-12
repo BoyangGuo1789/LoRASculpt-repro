@@ -108,3 +108,33 @@ Adapter verification passed:
 This smoke only verifies implementation and target-rank freezing. It does not
 yet establish metric value; the next gate is a full TFR-BS run followed by
 IconQA and OKVQA evaluation.
+
+## 2026-05-12 Full Balanced-Source Result
+
+Run `tfr_bs_ok3k_coco3k_full_20260512_125734` trained the same target-frozen
+residual adapter for one epoch on IconQA + 3,000 OKVQA + 3,000 COCO caption
+anchors. The inference setting remains unchanged: one checkpoint, one PEFT
+adapter, LoRA always active, no task gate and no checkpoint routing.
+
+Post-training adapter verification passed:
+
+- root adapter keys: `448`;
+- teacher keys in root adapter: `0`;
+- frozen target-block values checked: `79,953,920`;
+- residual-block values checked: `79,953,920`;
+- target-block max absolute diff vs init: `0.0`;
+- residual-block max absolute diff vs init: `1.465e-2`;
+- train loss: `0.49589`.
+
+| Method | IconQA | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Avg | Delta |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| LoRASculpt reproduced baseline | 86.26 | 52.71 | 54.70 | 56.34 | 51.64 | 53.8475 | 70.05375 | 0.00000 |
+| TFR-BS OKVQA+COCO residual | 86.56 | 58.64 | 60.25 | 56.78 | 53.13 | 57.2000 | 71.8800 | +1.82625 |
+
+Verdict: success. TFR-BS exceeds the reproduced LoRASculpt baseline by
+`+1.82625` average points and clears the required `baseline +1` threshold. The
+important mechanism evidence is that the frozen target rank block keeps IconQA
+above baseline while the residual ranks recover source/general capability across
+all four evaluated source tasks. The COCO caption anchors are useful here not as
+a new task-specific route, but as broad source activation coverage for the same
+always-on residual LoRA branch.
