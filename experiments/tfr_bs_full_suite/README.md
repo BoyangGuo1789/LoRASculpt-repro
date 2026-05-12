@@ -72,7 +72,7 @@ target block for the main method.
 | M1 | Main IconQA target table | Reproduced baseline vs TFR-BS on IconQA + four source tasks | done | Full metrics already recorded. |
 | M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | done | Probe CIDEr=1.2138; this is not a COCO-target fine-tune. |
 | M3 | COCO-Caption downstream adaptation | Train a COCO-target TFR-BS analogue if a COCO LoRASculpt target checkpoint exists or can be trained | pending | Needed for strict Table-1 parity. |
-| M4 | Rank scaling | Compare total rank/residual capacity variants | pending | Proposed: r48 freeze32, r64 freeze32, r96 freeze32. |
+| M4 | Rank scaling | Compare total rank/residual capacity variants | smoke passed | M4a rank96/freeze32 smoke passed; full eval is the next capacity test. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | pending | Use `MM_PROJECTOR_LR=0` mainline vs controlled variants. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
 | A2 | Target preservation ablation | remove or weaken target KL | done | A2a target_kl=0 full eval is the current best: Avg=71.8925. |
@@ -91,9 +91,9 @@ target block for the main method.
 3. `A4a` indicates freeze_rank16 is not enough target protection; keep
    freeze_rank32 for the main method unless a larger total-rank variant restores
    IconQA/GQA.
-4. Next training ablations should prioritize `M4` rank scaling and `A5` residual
-   regularization, because they test whether extra residual capacity or smaller
-   residual drift improves the target/source tradeoff.
+4. `M4a` rank96/freeze32 smoke passed, so the next full run should test whether
+   extra residual capacity improves the target/source tradeoff before trying
+   `A5` residual regularization.
 5. `S1` internal norm/delta analysis is now recorded; use it as method evidence
    before writing the method section.
 6. Train/evaluate the strict COCO-target analogue only after confirming whether
