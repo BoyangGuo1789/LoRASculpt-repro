@@ -53,3 +53,30 @@ The first smoke attempt showed that gradient masks alone were insufficient under
 the optimizer path, so TFR now restores frozen slices before each forward pass
 and again before final adapter saving. The reference slices live on the same
 device as the LoRA parameters to avoid per-step CPU-to-GPU copies.
+
+## 2026-05-12 Full OKVQA-Residual Result
+
+Run `tfr_lora_s3000_sw1_tkl1_full_20260512_104659` trained for one epoch on
+IconQA plus 3,000 OKVQA source examples with source weight `1.0`, target KL
+`1.0`, and frozen first 32 ranks.
+
+Post-training adapter verification passed:
+
+- root adapter keys: `448`;
+- teacher keys in root adapter: `0`;
+- frozen target-block values checked: `79,953,920`;
+- residual-block values checked: `79,953,920`;
+- target-block max absolute diff vs init: `0.0`;
+- residual-block max absolute diff vs init: `7.93e-3`;
+- train loss: `0.23130`.
+
+| Method | IconQA | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Avg | Delta |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| TFR-LoRA OKVQA residual | 86.42 | 57.77 | 54.20 | 55.61 | 52.38 | 54.9900 | 70.7050 | +0.65125 |
+
+Verdict: useful but not sufficient. TFR validates the core mechanism because it
+raises IconQA by `+0.16` and OKVQA by `+5.06` under one always-on adapter, but
+it loses `0.50` on OCRVQA and `0.73` on GQA. The next variant should keep the
+target-frozen residual structure while training the residual branch on a broader
+source mixture or adding a source-balance constraint so that the OKVQA gain does
+not come at the expense of other source/general datasets.
