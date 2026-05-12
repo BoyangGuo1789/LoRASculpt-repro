@@ -1,5 +1,5 @@
 id,priority,experiment,baseline_category,hypothesis,command_status,success_gate,notes
-A3a,1,COCO_SAMPLES=1500 with OKVQA_SAMPLES=3000,source-anchor ablation,Too much or too little COCO changes broad source retention,pending,IconQA>=86.20 and Avg>=71.05375,Compare to COCO=0 and COCO=3000.
+A3a,1,COCO_SAMPLES=1500 with OKVQA_SAMPLES=3000,source-anchor ablation,Too much or too little COCO changes broad source retention,smoke_passed,IconQA>=86.20 and Avg>=71.05375,"Smoke20 passed: train_loss=0.79485, frozen_diff=0.0, residual_diff=0.0005417. Full training next."
 A3b,1,COCO_SAMPLES=0 with OKVQA_SAMPLES=3000,source-anchor ablation,COCO anchors are responsible for OCRVQA/GQA/TextVQA recovery,done_existing,Existing TFR OKVQA-only Avg=70.7050,Recorded in target_frozen_residual_lora.
 A2a,2,LAMBDA_TARGET_KL=0.0,target preservation ablation,Target-teacher KL prevents residual branch from perturbing IconQA,pending,IconQA drop should be larger without KL,Run smoke before full.
 A2b,2,LAMBDA_TARGET_KL=0.5,target preservation ablation,Intermediate KL may improve source while preserving target,pending,Avg and IconQA gate,Optional if no-KL is informative.

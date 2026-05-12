@@ -47,7 +47,7 @@ gating, checkpoint routing, or LoRA-off evaluation.
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | pending | Use `MM_PROJECTOR_LR=0` mainline vs controlled variants. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
 | A2 | Target preservation ablation | remove or weaken target KL | pending | Tests whether target-teacher KL is needed. |
-| A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | pending | Highest-value next ablation. |
+| A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | smoke running/full pending | A3a COCO1500 smoke passed; full training next. |
 | A4 | Frozen-rank ablation | freeze_rank 16/32 with total rank64 | pending | Tests target block protection strength. |
 | A5 | Regularization ablation | residual L2 0/1e-6/1e-5 | pending | Tests whether residual drift control helps. |
 | R1 | Epoch robustness | evaluate checkpoints or max-step variants across training progress | pending | Mirrors paper Fig. 3 qualitatively. |
