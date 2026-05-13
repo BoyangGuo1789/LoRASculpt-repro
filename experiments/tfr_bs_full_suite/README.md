@@ -52,6 +52,7 @@ gating, checkpoint routing, or LoRA-off evaluation.
 | A4a | Freeze only 16 target ranks instead of 32, total rank64, target_kl=0.0 | 86.54 | 59.66 | 59.10 | 55.96 | 53.02 | 56.9350 | 71.7375 | Above baseline +1.6838; below A2a by 0.1550. |
 | M4a | Total rank96 with freeze32/residual64, target_kl=0.0 | 86.81 | 59.71 | 59.05 | 56.19 | 52.52 | 56.8675 | 71.8388 | Above baseline +1.7850; below A2a by 0.0538. Capacity helps IconQA/OKVQA but not broad source retention. |
 | A5a | Residual L2=1e-6 on rank64/freeze32, target_kl=0.0 | 86.80 | 59.03 | 59.20 | 56.07 | 53.06 | 56.8400 | 71.8200 | Above baseline +1.7663; below A2a by 0.0725. Regularization helps TextVQA but not enough to recover OKVQA/OCRVQA/GQA. |
+| D1a | Do not load target non-lora/projector state, rank64/freeze32, target_kl=0.0 | 80.11 | 61.36 | 66.25 | 58.94 | 55.91 | 60.6150 | 70.3625 | Diagnostic only: source retention rises sharply, but IconQA drops by 6.67 vs A2a; not a comparable main result. |
 
 A2a shows that the target-frozen block is doing the main target-preservation
 work; explicit target-teacher KL is not necessary in this seed. The gain over
@@ -78,6 +79,12 @@ configuration. It keeps IconQA high at 86.80 and improves TextVQA to 53.06, but
 OKVQA, OCRVQA, and GQA trail A2a enough that Avg=71.8200 remains 0.0725 below
 the current best. This rejects residual_l2=1e-6 as the default setting.
 
+D1a shows that the target non-lora/projector state is a necessary connector for
+the comparable always-on setting. Removing it raises SourceAvg to 60.6150, but
+IconQA collapses to 80.11, which is 6.67 points below A2a. This is useful
+evidence for the baseline limitation and target/source tradeoff, but it is not
+a publishable method result because the target task is no longer preserved.
+
 ## Full-Suite Work Items
 
 | ID | Baseline paper category | TFR-BS experiment | Status | Notes |
@@ -86,7 +93,7 @@ the current best. This rejects residual_l2=1e-6 as the default setting.
 | M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | done | Probe CIDEr=1.2138; this is not a COCO-target fine-tune. |
 | M3 | COCO-Caption downstream adaptation | Train a COCO-target TFR-BS analogue if a COCO LoRASculpt target checkpoint exists or can be trained | pending | Needed for strict Table-1 parity. |
 | M4 | Rank scaling | Compare total rank/residual capacity variants | done | M4a rank96/freeze32 full eval done: Avg=71.8388, above reproduced baseline but below A2a by 0.0538. |
-| D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | pending | Use `MM_PROJECTOR_LR=0` mainline vs controlled variants. |
+| D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | done | D1a LOAD_NON_LORA=False full eval done: SourceAvg=60.6150 but IconQA=80.11, confirming target connector state is necessary. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
 | A2 | Target preservation ablation | remove or weaken target KL | done | A2a target_kl=0 full eval is the current best: Avg=71.8925. |
 | A3 | Source-anchor ablation | COCO samples 0/1500/3000 and possibly OKVQA samples 1500/3000 | partial | A3a COCO1500 full eval done: Avg=71.7713 (+1.7175 vs baseline), below COCO3000 main by 0.1088. |
@@ -104,10 +111,10 @@ the current best. This rejects residual_l2=1e-6 as the default setting.
 3. `A4a` indicates freeze_rank16 is not enough target protection; keep
    freeze_rank32 for the main method unless a larger total-rank variant restores
    IconQA/GQA.
-4. `M4a` rank96/freeze32 and `A5a` residual_l2=1e-6 full evals are done.
-   Neither improves overall Avg over A2a, so keep rank64/freeze32/tkl0/no-L2 as
-   the main checkpoint. The next highest-value ablation is `D1` connector
-   diagnostics rather than another capacity or weak-L2 sweep.
+4. `M4a` rank96/freeze32, `A5a` residual_l2=1e-6, and `D1a` no-non-lora
+   connector diagnostic full evals are done. None improves the comparable
+   target-preserving average over A2a, so keep rank64/freeze32/tkl0/no-L2 with
+   loaded target non-lora/projector state as the main checkpoint.
 5. `S1` internal norm/delta analysis is now recorded; use it as method evidence
    before writing the method section.
 6. Train/evaluate the strict COCO-target analogue only after confirming whether
