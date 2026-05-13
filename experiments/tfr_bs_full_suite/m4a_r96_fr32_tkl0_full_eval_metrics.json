@@ -1,0 +1,46 @@
+{
+  "date": "2026-05-13",
+  "category": "M4a",
+  "run_name": "tfr_bs_ok3k_coco3k_r96_fr32_tkl0_full_no2_20260513_022121",
+  "stage": "full_eval",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-r96-fr32-sw1-tkl0-full-no2-20260513_022121",
+  "target_task": "IconQA",
+  "train_mix": "IconQA10000+OKVQA3000+COCO3000",
+  "rank": 96,
+  "alpha": 192,
+  "freeze_rank": 32,
+  "okvqa_samples": 3000,
+  "coco_samples": 3000,
+  "lambda_target_kl": 0.0,
+  "residual_l2": 0.0,
+  "metrics": {
+    "IconQA": 86.81,
+    "OKVQA": 59.71,
+    "OCRVQA": 59.05,
+    "GQA": 56.19,
+    "TextVQA": 52.52,
+    "SourceAvg": 56.8675,
+    "Avg": 71.83875
+  },
+  "delta_vs_reproduced_baseline": 1.7850000000000108,
+  "delta_vs_a2a_current_best": -0.05374999999999375,
+  "delta_vs_tkl1_main": -0.041249999999990905,
+  "verdict": "success_above_plus1_below_current_best",
+  "train_loss": 0.48792971891351045,
+  "adapter_diff": {
+    "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-r96-fr32-sw1-tkl0-full-no2-20260513_022121/adapter_model.bin",
+    "init_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-init-target-r96-a192/adapter_model.bin",
+    "checked_lora_tensors": 448,
+    "freeze_rank": 32,
+    "frozen_values": 79953920,
+    "residual_values": 159907840,
+    "max_frozen_abs_diff": 0.0,
+    "max_residual_abs_diff": 0.01434326171875
+  },
+  "logs": {
+    "train": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_r96_fr32_tkl0_full_no2_20260513_022121.log",
+    "eval": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_r96_fr32_tkl0_eval_20260513_121617.log",
+    "summary": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/tfr_bs_ok3k_coco3k_r96_fr32_tkl0_full_20260513_121617/summary.txt"
+  },
+  "gpu_policy": "Training used GPUs 0,1,4,6; evaluation used GPUs 4,5,6,7 to avoid GPU 2 fan issue."
+}
