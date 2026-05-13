@@ -53,10 +53,16 @@ not on the same scale as IconQA accuracy.
 | Method | COCO CIDEr | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg |
 |---|---:|---:|---:|---:|---:|---:|
 | LoRASculpt COCO-target reproduced baseline | 1.1667 | 5.96 | 58.35 | 58.15 | 26.27 | 37.1825 |
+| TFR-BS COCO-target + OKVQA3k anchors | 1.0784 | 10.52 | 59.30 | 54.71 | 33.22 | 39.4375 |
 
-This establishes the M3 baseline reference for the matched COCO-target TFR-BS
-analogue. It also exposes a sharper source-retention failure than the IconQA
-target setting, especially on OKVQA and TextVQA.
+This establishes the M3 comparison for strict COCO-target adaptation. The
+matched TFR-BS analogue improves SourceAvg by +2.2550 over the reproduced
+LoRASculpt COCO baseline, mainly through OKVQA (+4.56), TextVQA (+6.95), and
+OCRVQA (+0.95), but it lowers COCO CIDEr by -0.0883 and GQA by -3.44. This is a
+useful stress-test result rather than a new best target-task setting: balanced
+source anchors recover part of the source loss under always-on inference, while
+COCO caption target quality remains better with the original LoRASculpt
+fine-tune.
 
 
 ## Completed Ablations
@@ -107,7 +113,7 @@ a publishable method result because the target task is no longer preserved.
 |---|---|---|---|---|
 | M1 | Main IconQA target table | Reproduced baseline vs TFR-BS on IconQA + four source tasks | done | Full metrics already recorded. |
 | M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | done | Probe CIDEr=1.2138; this is not a COCO-target fine-tune. |
-| M3 | COCO-Caption downstream adaptation | Strict COCO-target LoRASculpt baseline, then matched COCO-target TFR-BS analogue | baseline_done | Baseline reproduced/evaluated: CIDEr=1.1667, SourceAvg=37.1825. TFR-BS analogue is still pending for strict Table-1 parity. |
+| M3 | COCO-Caption downstream adaptation | Strict COCO-target LoRASculpt baseline, then matched COCO-target TFR-BS analogue | done | Baseline: CIDEr=1.1667, SourceAvg=37.1825. TFR-BS analogue: CIDEr=1.0784, SourceAvg=39.4375. |
 | M4 | Rank scaling | Compare total rank/residual capacity variants | done | M4a rank96/freeze32 full eval done: Avg=71.8388, above reproduced baseline but below A2a by 0.0538. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | done | D1a LOAD_NON_LORA=False full eval done: SourceAvg=60.6150 but IconQA=80.11, confirming target connector state is necessary. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
@@ -133,9 +139,10 @@ a publishable method result because the target task is no longer preserved.
    loaded target non-lora/projector state as the main checkpoint.
 5. `S1` internal norm/delta analysis is now recorded; use it as method evidence
    before writing the method section.
-6. The strict COCO-target LoRASculpt baseline is now reproduced. Next train the
-   matched COCO-target TFR-BS analogue and compare CIDEr plus the same four
-   source tasks against this B1 baseline.
+6. The strict COCO-target comparison is now complete. TFR-BS improves SourceAvg
+   from 37.1825 to 39.4375 but lowers CIDEr from 1.1667 to 1.0784, so the paper
+   should present it as a source-retention stress test, not as a target-metric
+   win.
 
 ## Logging Rules
 
