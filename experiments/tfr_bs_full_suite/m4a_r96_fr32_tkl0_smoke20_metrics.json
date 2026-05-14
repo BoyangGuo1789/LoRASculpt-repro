@@ -1,0 +1,17 @@
+{
+  "run_name": "tfr_bs_ok3k_coco3k_r96_fr32_tkl0_smoke20_20260513_021036",
+  "stage": "smoke20",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-r96-fr32-sw1-tkl0-smoke20-20260513_021036-20260513_021036-smoke",
+  "init_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-init-target-r96-a192/adapter_model.bin",
+  "rank": 96,
+  "alpha": 192,
+  "freeze_rank": 32,
+  "checked_lora_tensors": 448,
+  "frozen_values": 79953920,
+  "residual_values": 159907840,
+  "max_frozen_abs_diff": 0.0,
+  "max_residual_abs_diff": 0.00054931640625,
+  "train_loss": 0.9599892050027847,
+  "train_log": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_r96_fr32_tkl0_smoke20_20260513_021036.log",
+  "gpu_policy": "Launched on GPUs 0,1,4,6 to avoid GPU 2 fan issue."
+}

@@ -69,9 +69,17 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
     cat $RESULT_DIR/$SPLIT/$CKPT/${CHUNKS}_${IDX}.jsonl >> "$output_file"
 done
 
-
-python -m llava.eval.eval_caption \
-    --annotation-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/captions_test5k.json \
-    --result-file $output_file \
-    --output-dir $RESULT_DIR/$SPLIT/$CKPT \
-    --summary-output-dir $SUMMARY_OUTPUT_DIR
+CAPTION_EVAL_PYTHON=${CAPTION_EVAL_PYTHON:-python}
+if [ "$CAPTION_EVAL_PYTHON" = "python" ]; then
+    python -m llava.eval.eval_caption \
+        --annotation-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/captions_test5k.json \
+        --result-file $output_file \
+        --output-dir $RESULT_DIR/$SPLIT/$CKPT \
+        --summary-output-dir $SUMMARY_OUTPUT_DIR
+else
+    $CAPTION_EVAL_PYTHON llava/eval/eval_caption.py \
+        --annotation-file /data/guoboyang/LoRa-Projects/LoRASculpt-repro/data/coco/captions_test5k.json \
+        --result-file $output_file \
+        --output-dir $RESULT_DIR/$SPLIT/$CKPT \
+        --summary-output-dir $SUMMARY_OUTPUT_DIR
+fi

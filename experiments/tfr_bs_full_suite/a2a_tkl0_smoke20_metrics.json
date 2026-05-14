@@ -1,0 +1,20 @@
+{
+  "run_name": "tfr_bs_ok3k_coco3k_tkl0_smoke20_20260512_184722",
+  "category": "A2a",
+  "stage": "smoke20",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-sw1-tkl0-smoke20-20260512_184722-20260512_184722-smoke",
+  "train_loss": 0.9624086916446686,
+  "gradient_masks": {
+    "hooks": 448,
+    "freeze_rank": 32,
+    "frozen_values": 79953920,
+    "residual_values": 79953920
+  },
+  "diff_check": {
+    "max_frozen_abs_diff": 0.0,
+    "max_residual_abs_diff": 0.00055694580078125,
+    "checked_lora_tensors": 448
+  },
+  "log": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_tkl0_smoke20_20260512_184722.log",
+  "verdict": "smoke_passed"
+}

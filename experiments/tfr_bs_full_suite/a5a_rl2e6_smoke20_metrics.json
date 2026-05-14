@@ -1,0 +1,29 @@
+{
+  "date": "2026-05-13",
+  "category": "A5a",
+  "run_name": "tfr_bs_ok3k_coco3k_tkl0_rl2e6_smoke20_20260513_130208",
+  "stage": "smoke20",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-r64-fr32-sw1-tkl0-rl2e6-smoke20-20260513_130208-20260513_130208-smoke",
+  "target_task": "IconQA",
+  "train_mix": "IconQA10000+OKVQA3000+COCO3000",
+  "rank": 64,
+  "freeze_rank": 32,
+  "okvqa_samples": 3000,
+  "coco_samples": 3000,
+  "lambda_target_kl": 0.0,
+  "residual_l2": 1e-06,
+  "train_loss": 0.963983353972435,
+  "adapter_diff": {
+    "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-r64-fr32-sw1-tkl0-rl2e6-smoke20-20260513_130208-20260513_130208-smoke/adapter_model.bin",
+    "init_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-init-target-r64-a128/adapter_model.bin",
+    "checked_lora_tensors": 448,
+    "freeze_rank": 32,
+    "frozen_values": 79953920,
+    "residual_values": 79953920,
+    "max_frozen_abs_diff": 0.0,
+    "max_residual_abs_diff": 0.00054931640625
+  },
+  "train_log": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/tfr_bs_ok3k_coco3k_tkl0_rl2e6_smoke20_20260513_130208.log",
+  "gpu_policy": "Launched on GPUs 0,1,4,6 to avoid GPU 2 fan issue.",
+  "verdict": "smoke_passed"
+}

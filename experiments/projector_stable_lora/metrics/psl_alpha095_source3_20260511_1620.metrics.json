@@ -1,0 +1,23 @@
+{
+  "run_name": "psl_alpha095_source3_20260511_1620",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-psl-alpha095-iconqa-r32-gamma090",
+  "tasks_completed": [
+    "okvqa",
+    "ocrvqa",
+    "textvqa"
+  ],
+  "metrics": {
+    "IconQA": null,
+    "OKVQA": 53.27,
+    "OCRVQA": 56.75,
+    "GQA": null,
+    "TextVQA": 52.35,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "1c3ff85cf297efec04a83ad91a17a3d4f106ecc6",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/psl_alpha095_source3_20260511_1620.log"
+}

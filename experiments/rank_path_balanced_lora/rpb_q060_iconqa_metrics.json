@@ -1,0 +1,21 @@
+{
+  "run_name": "rpb_q060_iconqa",
+  "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-rpb-q060-r32",
+  "tasks_completed": [
+    "iconqa"
+  ],
+  "metrics": {
+    "IconQA": 86.64,
+    "OKVQA": null,
+    "OCRVQA": null,
+    "GQA": null,
+    "TextVQA": null,
+    "SourceAvg": null,
+    "Avg": null
+  },
+  "required_gqa_for_target": null,
+  "target_avg": 71.05375,
+  "promote_to_full_eval": false,
+  "git_commit": "c83399d0fc66a7e3d8171cc75d27e5e5e346f6a7",
+  "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/llava-v1.5-7b-lorasculpt-rpb-q060-r32_iconqa_eval_20260512_003648.log"
+}

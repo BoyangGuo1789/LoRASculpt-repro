@@ -1,6 +1,6 @@
-# [CVPR'25 Oral] LoRASculpt
+# LoRASculpt Baseline Continuation
 
-This repository is built for the paper [LoRASculpt: Sculpting LoRA for Harmonizing General and Specialized Knowledge in Multimodal Large Language Models](https://arxiv.org/abs/2503.16843).
+This repository records our continued reproduction and follow-up attempts based on the LoRASculpt baseline. The baseline comes from [LoRASculpt: Sculpting LoRA for Harmonizing General and Specialized Knowledge in Multimodal Large Language Models](https://arxiv.org/abs/2503.16843).
 
 <div align="center">
 <img alt="method" src="images/LoRASculpt.png">

@@ -1,0 +1,417 @@
+{
+  "init_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-init-target-r64-a128/adapter_model.bin",
+  "runs": {
+    "M1_tkl1_fr32": {
+      "checkpoint_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-sw1-tkl1-full-20260512_125734/adapter_model.bin",
+      "freeze_rank": 32,
+      "checked_lora_tensors": 448,
+      "summary": {
+        "frozen_delta_sq": 0.0,
+        "frozen_delta_numel": 79953920.0,
+        "frozen_delta_max_abs": 0.0,
+        "residual_delta_sq": 27.10020781843923,
+        "residual_delta_numel": 79953920.0,
+        "residual_delta_max_abs": 0.0146484375,
+        "frozen_delta_l2": 0.0,
+        "frozen_delta_rms": 0.0,
+        "residual_delta_l2": 5.205785994298962,
+        "residual_delta_rms": 0.0005821922635019628
+      },
+      "by_group": {
+        "down_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 4.832870769081637,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.01019287109375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.198379123145423,
+          "residual_delta_rms": 0.0005589933280571895
+        },
+        "gate_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 5.461975833401084,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.0111083984375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.3370870401850854,
+          "residual_delta_rms": 0.0005942633137286977
+        },
+        "k_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.511595985852182,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.00946044921875,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.5848015604018637,
+          "residual_delta_rms": 0.0005471796534156151
+        },
+        "o_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.158657195046544,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.010986328125,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.7772611499288855,
+          "residual_delta_rms": 0.0006136295952412677
+        },
+        "q_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.1710525546222925,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.010986328125,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.4734492032717967,
+          "residual_delta_rms": 0.0005087333610192398
+        },
+        "up_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 5.072743487544358,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.0146484375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.2522751802442698,
+          "residual_delta_rms": 0.0005726977596584771
+        },
+        "v_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.891311992891133,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.010009765625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.9726408676926301,
+          "residual_delta_rms": 0.0006810877609331904
+        }
+      }
+    },
+    "A2a_tkl0_fr32": {
+      "checkpoint_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-sw1-tkl0-full-20260512_190205/adapter_model.bin",
+      "freeze_rank": 32,
+      "checked_lora_tensors": 448,
+      "summary": {
+        "frozen_delta_sq": 0.0,
+        "frozen_delta_numel": 79953920.0,
+        "frozen_delta_max_abs": 0.0,
+        "residual_delta_sq": 25.716221638023853,
+        "residual_delta_numel": 79953920.0,
+        "residual_delta_max_abs": 0.011474609375,
+        "frozen_delta_l2": 0.0,
+        "frozen_delta_rms": 0.0,
+        "residual_delta_l2": 5.0711164094333165,
+        "residual_delta_rms": 0.0005671314080377424
+      },
+      "by_group": {
+        "down_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 4.531338259577751,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.0089111328125,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.1286940267632994,
+          "residual_delta_rms": 0.0005412741350697241
+        },
+        "gate_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 5.0416547963395715,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.01025390625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.2453629542547393,
+          "residual_delta_rms": 0.0005709401518966991
+        },
+        "k_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.444316982291639,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.00872802734375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.5634311568763233,
+          "residual_delta_rms": 0.0005398011586648326
+        },
+        "o_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.888593574985862,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.0093994140625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.699586295245364,
+          "residual_delta_rms": 0.0005868110325096283
+        },
+        "q_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.0924926940351725,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.00799560546875,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.446545088835869,
+          "residual_delta_rms": 0.0004994442585976269
+        },
+        "up_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 4.798608103767037,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.011474609375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.19057255158715,
+          "residual_delta_rms": 0.0005570083103820619
+        },
+        "v_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.91921722702682,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.01025390625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.9797012974251496,
+          "residual_delta_rms": 0.0006835254942056296
+        }
+      }
+    },
+    "A3a_coco1500_fr32": {
+      "checkpoint_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco1500-sw1-tkl1-full-20260512_164743/adapter_model.bin",
+      "freeze_rank": 32,
+      "checked_lora_tensors": 448,
+      "summary": {
+        "frozen_delta_sq": 0.0,
+        "frozen_delta_numel": 79953920.0,
+        "frozen_delta_max_abs": 0.0,
+        "residual_delta_sq": 22.70312817208469,
+        "residual_delta_numel": 79953920.0,
+        "residual_delta_max_abs": 0.010986328125,
+        "frozen_delta_l2": 0.0,
+        "frozen_delta_rms": 0.0,
+        "residual_delta_l2": 4.764779971004399,
+        "residual_delta_rms": 0.0005328720849158595
+      },
+      "by_group": {
+        "down_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 4.201583832502365,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.0103759765625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.049776532332821,
+          "residual_delta_rms": 0.0005212073720673037
+        },
+        "gate_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 4.069010766223073,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.01025390625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.0171789127945674,
+          "residual_delta_rms": 0.000512918605293373
+        },
+        "k_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.297396520152688,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.010986328125,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.5157165038860954,
+          "residual_delta_rms": 0.0005233268643819453
+        },
+        "o_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.0357836075127125,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.0093994140625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.7423500243959915,
+          "residual_delta_rms": 0.0006015759362553477
+        },
+        "q_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 1.7135075544938445,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.00921630859375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.3090101430064798,
+          "residual_delta_rms": 0.00045195798279387407
+        },
+        "up_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 15466496.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.9996967702172697,
+          "residual_delta_numel": 15466496.0,
+          "residual_delta_max_abs": 0.009521484375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.9999241911175707,
+          "residual_delta_rms": 0.0005085311571988312
+        },
+        "v_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 8388608.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.3861491209827363,
+          "residual_delta_numel": 8388608.0,
+          "residual_delta_max_abs": 0.01043701171875,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.840149211608324,
+          "residual_delta_rms": 0.0006353427665641236
+        }
+      }
+    },
+    "A4a_tkl0_fr16": {
+      "checkpoint_adapter": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-ok3k-coco3k-fr16-sw1-tkl0-full-no2-20260512_230610/adapter_model.bin",
+      "freeze_rank": 16,
+      "checked_lora_tensors": 448,
+      "summary": {
+        "frozen_delta_sq": 0.0,
+        "frozen_delta_numel": 39976960.0,
+        "frozen_delta_max_abs": 0.0,
+        "residual_delta_sq": 31.790725803002715,
+        "residual_delta_numel": 119930880.0,
+        "residual_delta_max_abs": 0.01336669921875,
+        "frozen_delta_l2": 0.0,
+        "frozen_delta_rms": 0.0,
+        "residual_delta_l2": 5.638326507307174,
+        "residual_delta_rms": 0.0005148547352938811
+      },
+      "by_group": {
+        "down_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 7733248.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 5.8343245554715395,
+          "residual_delta_numel": 23199744.0,
+          "residual_delta_max_abs": 0.01025390625,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.4154346514595546,
+          "residual_delta_rms": 0.0005014800910088662
+        },
+        "gate_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 7733248.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 6.245721561834216,
+          "residual_delta_numel": 23199744.0,
+          "residual_delta_max_abs": 0.01251220703125,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.4991441658764337,
+          "residual_delta_rms": 0.0005188594288778161
+        },
+        "k_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 4194304.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.926252414472401,
+          "residual_delta_numel": 12582912.0,
+          "residual_delta_max_abs": 0.0130615234375,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.710629245182135,
+          "residual_delta_rms": 0.00048224231210427344
+        },
+        "o_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 4194304.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 3.629294065758586,
+          "residual_delta_numel": 12582912.0,
+          "residual_delta_max_abs": 0.0106201171875,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.9050706196250538,
+          "residual_delta_rms": 0.0005370571460282089
+        },
+        "q_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 4194304.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 2.303208051249385,
+          "residual_delta_numel": 12582912.0,
+          "residual_delta_max_abs": 0.0115966796875,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 1.5176323834346,
+          "residual_delta_rms": 0.00042783469975920884
+        },
+        "up_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 7733248.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 6.226781249977648,
+          "residual_delta_numel": 23199744.0,
+          "residual_delta_max_abs": 0.01336669921875,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.4953519290828794,
+          "residual_delta_rms": 0.0005180721042233445
+        },
+        "v_proj": {
+          "frozen_delta_sq": 0.0,
+          "frozen_delta_numel": 4194304.0,
+          "frozen_delta_max_abs": 0.0,
+          "residual_delta_sq": 4.625143904238939,
+          "residual_delta_numel": 12582912.0,
+          "residual_delta_max_abs": 0.01104736328125,
+          "frozen_delta_l2": 0.0,
+          "frozen_delta_rms": 0.0,
+          "residual_delta_l2": 2.1506147735563754,
+          "residual_delta_rms": 0.0006062783293144333
+        }
+      }
+    }
+  }
+}

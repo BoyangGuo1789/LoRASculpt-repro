@@ -4,10 +4,10 @@ set -euo pipefail
 export HF_HUB_OFFLINE=${HF_HUB_OFFLINE:-1}
 export TRANSFORMERS_OFFLINE=${TRANSFORMERS_OFFLINE:-1}
 
-source ./scripts/v1_5/train/trainconfig_migdis_lora.sh
+source ./scripts/v1_5/train/trainconfig_pars_lora.sh
 
-export DEVICE=${DEVICE:-localhost:4,5,6,7}
-export MASTER_PORT=${MASTER_PORT:-29640}
+export DEVICE=${DEVICE:-localhost:0,1,2,3}
+export MASTER_PORT=${MASTER_PORT:-29660}
 export PER_DEVICE_TRAIN_BATCH_SIZE=${PER_DEVICE_TRAIN_BATCH_SIZE:-4}
 export GRADIENT_ACCUMULATION_STEPS=${GRADIENT_ACCUMULATION_STEPS:-1}
 export DEEPSPEED_ZEROFILE=${DEEPSPEED_ZEROFILE:-"./scripts/zero2.json"}
@@ -21,7 +21,7 @@ export CMR_LAMBDA=${CMR_LAMBDA:-1e-3}
 export STEP_THRESHOLD=${STEP_THRESHOLD:-100}
 
 export DATASET_NAME="iconqa_txt"
-export TRAINER_NAME="LoRASculptMIGDIS"
+export TRAINER_NAME="LoRASculptPARS"
 export MODEL_NAME_OR_PATH=${MODEL_NAME_OR_PATH:-"/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/llava-v1.5-7b-ft"}
 export VISION_TOWER=${VISION_TOWER:-"/data/guoboyang/LoRa-Projects/LoRASculpt-repro/models/clip-vit-large-patch14-336"}
 export DATA_PATH_OVERRIDE="/data/guoboyang/LoRa-Projects/LoRASculpt-repro/downloads/official_issue2/extracted/LoRASculpt_JSON_files/IconQA_txt/iconqa_txt-train.json"
@@ -31,6 +31,7 @@ OUTPUT_DIR_SUFFIX=""
 extra_args=()
 if [[ "${SMOKE:-0}" == "1" ]]; then
     export STEP_THRESHOLD=${STEP_THRESHOLD_OVERRIDE:-1}
+    : ${SMOKE_MAX_STEPS:=20}
     : ${MAX_STEPS:=$SMOKE_MAX_STEPS}
     OUTPUT_DIR_SUFFIX="-smoke"
     extra_args+=(--max_steps "$MAX_STEPS" --save_steps "$MAX_STEPS")
@@ -41,19 +42,20 @@ fi
 OUTPUT_ROOT=${OUTPUT_ROOT:-"/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints"}
 OUTPUT_DIR=${OUTPUT_DIR:-"${OUTPUT_ROOT}/${RUN_NAME}${OUTPUT_DIR_SUFFIX}"}
 
-echo "[LoRASculpt-MIG-DIS] data_path=$DATA_PATH_OVERRIDE"
-echo "[LoRASculpt-MIG-DIS] image_folder=$IMAGE_FOLDER_OVERRIDE"
-echo "[LoRASculpt-MIG-DIS] output_dir=$OUTPUT_DIR"
-echo "[LoRASculpt-MIG-DIS] trainer=$TRAINER_NAME rank=$LORA_RANK alpha=$LORA_ALPHA"
-echo "[LoRASculpt-MIG-DIS] grad_mix=$MIGDIS_GRAD_MIX source_margin=$MIGDIS_SOURCE_MARGIN source_scope=$MIGDIS_SOURCE_SCOPE beta=$MIGDIS_GRAD_EMA_BETA norm=$MIGDIS_NORM"
-echo "[LoRASculpt-MIG-DIS] selection_mode=$MIGDIS_SELECTION_MODE tgsr_candidate_ratio=$MIGDIS_TGSR_CANDIDATE_RATIO tgsr_core_source_margin=$MIGDIS_TGSR_CORE_SOURCE_MARGIN"
-echo "[LoRASculpt-MIG-DIS] dqss_rho=$MIGDIS_DQSS_RHO dqss_aux_grad_mix=$MIGDIS_DQSS_AUX_GRAD_MIX dqss_aux_source_margin=$MIGDIS_DQSS_AUX_SOURCE_MARGIN dqss_module_scope=$MIGDIS_DQSS_MODULE_SCOPE"
-echo "[LoRASculpt-MIG-DIS] dqss_anti_collapse=$MIGDIS_DQSS_ANTI_COLLAPSE dqss_max_aux_overlap=$MIGDIS_DQSS_MAX_AUX_OVERLAP dqss_min_core_overlap=$MIGDIS_DQSS_MIN_CORE_OVERLAP"
-echo "[LoRASculpt-MIG-DIS] rpb_quota_frac=$MIGDIS_RPB_QUOTA_FRAC rpb_min_per_rank=$MIGDIS_RPB_MIN_PER_RANK"
-echo "[LoRASculpt-MIG-DIS] step_threshold=$STEP_THRESHOLD extra_args=${extra_args[*]:-}"
+echo "[PARS-LoRA] data_path=$DATA_PATH_OVERRIDE"
+echo "[PARS-LoRA] image_folder=$IMAGE_FOLDER_OVERRIDE"
+echo "[PARS-LoRA] output_dir=$OUTPUT_DIR"
+echo "[PARS-LoRA] trainer=$TRAINER_NAME rank=$LORA_RANK alpha=$LORA_ALPHA ratio=$AB_PRESERVE_RATIO cmr_lambda=$CMR_LAMBDA omega=$OMEGA step_threshold=$STEP_THRESHOLD"
+echo "[PARS-LoRA] projector_lambda=$PARS_PROJECTOR_LAMBDA projector_tau=$PARS_PROJECTOR_TAU projector_warmup=$PARS_PROJECTOR_WARMUP_STEPS"
+echo "[PARS-LoRA] stable_rank=$PARS_STABLE_RANK stable_lr_mult=$PARS_STABLE_LR_MULT orth_lambda=$PARS_ORTH_LAMBDA"
+echo "[PARS-LoRA] migdis_enable=$MIGDIS_ENABLE migdis_selection_mode=$MIGDIS_SELECTION_MODE"
+echo "[PARS-LoRA] extra_args=${extra_args[*]:-}"
 
 "$DEEPSPEED_BIN" --include "$DEVICE" --master_port "$MASTER_PORT" llava/train/train_mem.py \
-    --lora_enable True --lora_r "$LORA_RANK" --lora_alpha "$LORA_ALPHA" --mm_projector_lr 2e-5 \
+    --lora_enable True \
+    --lora_r "$LORA_RANK" \
+    --lora_alpha "$LORA_ALPHA" \
+    --mm_projector_lr "${MM_PROJECTOR_LR:-2e-5}" \
     --deepspeed "$DEEPSPEED_ZEROFILE" \
     --model_name_or_path "$MODEL_NAME_OR_PATH" \
     --version v1 \
@@ -94,25 +96,17 @@ echo "[LoRASculpt-MIG-DIS] step_threshold=$STEP_THRESHOLD extra_args=${extra_arg
     --migdis_source_margin "$MIGDIS_SOURCE_MARGIN" \
     --migdis_source_scope "$MIGDIS_SOURCE_SCOPE" \
     --migdis_norm "$MIGDIS_NORM" \
-    --migdis_norm_q_low "$MIGDIS_NORM_Q_LOW" \
-    --migdis_norm_q_high "$MIGDIS_NORM_Q_HIGH" \
     --migdis_eps "$MIGDIS_EPS" \
-    --migdis_source_chunk_rows "$MIGDIS_SOURCE_CHUNK_ROWS" \
     --migdis_final_gamma "$MIGDIS_FINAL_GAMMA" \
     --migdis_debug_dump "$MIGDIS_DEBUG_DUMP" \
     --migdis_selection_mode "$MIGDIS_SELECTION_MODE" \
-    --migdis_tgsr_candidate_ratio "$MIGDIS_TGSR_CANDIDATE_RATIO" \
-    --migdis_tgsr_core_source_margin "$MIGDIS_TGSR_CORE_SOURCE_MARGIN" \
-    --migdis_tgsr_debug_overlap "$MIGDIS_TGSR_DEBUG_OVERLAP" \
-    --migdis_dqss_aux_grad_mix "$MIGDIS_DQSS_AUX_GRAD_MIX" \
-    --migdis_dqss_aux_source_margin "$MIGDIS_DQSS_AUX_SOURCE_MARGIN" \
-    --migdis_dqss_rho "$MIGDIS_DQSS_RHO" \
-    --migdis_dqss_debug_overlap "$MIGDIS_DQSS_DEBUG_OVERLAP" \
-    --migdis_dqss_module_scope "$MIGDIS_DQSS_MODULE_SCOPE" \
-    --migdis_dqss_anti_collapse "$MIGDIS_DQSS_ANTI_COLLAPSE" \
-    --migdis_dqss_max_aux_overlap "$MIGDIS_DQSS_MAX_AUX_OVERLAP" \
-    --migdis_dqss_min_core_overlap "$MIGDIS_DQSS_MIN_CORE_OVERLAP" \
-    --migdis_rpb_quota_frac "$MIGDIS_RPB_QUOTA_FRAC" \
-    --migdis_rpb_min_per_rank "$MIGDIS_RPB_MIN_PER_RANK" \
-    --migdis_rpb_debug_overlap "$MIGDIS_RPB_DEBUG_OVERLAP" \
+    --pars_enable "$PARS_ENABLE" \
+    --pars_projector_lambda "$PARS_PROJECTOR_LAMBDA" \
+    --pars_projector_tau "$PARS_PROJECTOR_TAU" \
+    --pars_projector_warmup_steps "$PARS_PROJECTOR_WARMUP_STEPS" \
+    --pars_stable_rank "$PARS_STABLE_RANK" \
+    --pars_stable_lr_mult "$PARS_STABLE_LR_MULT" \
+    --pars_orth_lambda "$PARS_ORTH_LAMBDA" \
+    --pars_log_every "$PARS_LOG_EVERY" \
+    --pars_eps "$PARS_EPS" \
     "${extra_args[@]}"
