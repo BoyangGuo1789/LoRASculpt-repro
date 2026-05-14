@@ -1,0 +1,40 @@
+{
+  "date": "2026-05-14",
+  "root_cause": "Legacy COCO-source evals used source JSONs without the short-answer instruction, producing verbose OKVQA/TextVQA answers that official VQA exact/soft matching penalized. Re-evaluating the same checkpoints with official issue2 source JSONs fixes the Table 1 COCO source metrics.",
+  "official_json_root": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/downloads/official_issue2/extracted/LoRASculpt_JSON_files",
+  "gpu_policy": "Evaluated on CUDA_VISIBLE_DEVICES=0,1,3,4,5,6,7, avoiding throttled GPU 2.",
+  "runs": {
+    "lorasculpt_coco_rank32_source_official": {
+      "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-coco_official_issue2-LoRASculpt-lora-r32-a64-e3-CMRLAMBDA1e-3-OMEGA1.0-RATIO0.1",
+      "run_name": "lorasculpt_coco_rank32_source_official_20260514",
+      "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/lorasculpt_coco_rank32_source_official_eval_20260514_table1_coco_baseline_official.log",
+      "result_root": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/diagnose_table1_coco_baseline_official_20260514/lorasculpt_coco_rank32_source_official_20260514",
+      "metrics": {
+        "OKVQA": 50.57,
+        "OCRVQA": 58.35,
+        "GQA": 58.15,
+        "TextVQA": 50.37,
+        "SourceAvg": 54.36
+      },
+      "cider": 1.1667,
+      "table_target": 116.67,
+      "table_avg": 85.515
+    },
+    "xlora_coco_rank64_source_official": {
+      "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-lorasculpt-tfr-bs-coco-ok3k-sw1-tkl0-full-no2-20260513_220227",
+      "run_name": "xlora_coco_r64_old_checkpoint_source_official_20260514",
+      "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/xlora_coco_r64_old_checkpoint_source_official_eval_20260514_table1_coco_r64_official.log",
+      "result_root": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/repro_results/diagnose_table1_coco_r64_official_20260514/xlora_coco_r64_old_checkpoint_source_official_20260514",
+      "metrics": {
+        "OKVQA": 57.45,
+        "OCRVQA": 59.35,
+        "GQA": 54.71,
+        "TextVQA": 50.46,
+        "SourceAvg": 55.4925
+      },
+      "cider": 1.0784,
+      "table_target": 107.84,
+      "table_avg": 81.66625
+    }
+  }
+}

@@ -52,17 +52,19 @@ not on the same scale as IconQA accuracy.
 
 | Method | COCO CIDEr | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg |
 |---|---:|---:|---:|---:|---:|---:|
-| LoRASculpt COCO-target reproduced baseline | 1.1667 | 5.96 | 58.35 | 58.15 | 26.27 | 37.1825 |
-| TFR-BS COCO-target + OKVQA3k anchors | 1.0784 | 10.52 | 59.30 | 54.71 | 33.22 | 39.4375 |
+| LoRASculpt COCO-target reproduced baseline | 1.1667 | 50.57 | 58.35 | 58.15 | 50.37 | 54.3600 |
+| TFR-BS COCO-target + OKVQA3k anchors | 1.0784 | 57.45 | 59.35 | 54.71 | 50.46 | 55.4925 |
 
-This establishes the M3 comparison for strict COCO-target adaptation. The
-matched TFR-BS analogue improves SourceAvg by +2.2550 over the reproduced
-LoRASculpt COCO baseline, mainly through OKVQA (+4.56), TextVQA (+6.95), and
-OCRVQA (+0.95), but it lowers COCO CIDEr by -0.0883 and GQA by -3.44. This is a
-useful stress-test result rather than a new best target-task setting: balanced
-source anchors recover part of the source loss under always-on inference, while
-COCO caption target quality remains better with the original LoRASculpt
-fine-tune.
+This establishes the M3 comparison for strict COCO-target adaptation under the
+official issue2 source-evaluation protocol. An earlier ledger version used legacy
+source JSONs without the short-answer instruction, which produced verbose OKVQA
+and TextVQA answers and severely underreported source accuracy. Re-evaluation of
+the same checkpoints with official issue2 prompts raises the reproduced
+LoRASculpt COCO baseline SourceAvg to 54.3600 and the matched TFR-BS analogue
+SourceAvg to 55.4925. The TFR-BS analogue improves SourceAvg by +1.1325, mainly
+through OKVQA (+6.88) and OCRVQA (+1.00), but lowers COCO CIDEr by -0.0883 and
+GQA by -3.44. This is a useful source-retention stress test rather than a
+target-metric win.
 
 
 
@@ -80,10 +82,13 @@ COCO `Avg` blank because CIDEr and VQA accuracy are on different scales.
 | IconQA | 16 | 8 | 59.14 | 58.75 | 55.88 | 51.82 | 56.3975 | 86.68 | 71.5388 |
 | COCO-Caption | 32 | 16 | 57.44 | 60.55 | 54.07 | 50.23 | 55.5725 | 109.35 | 82.4613 |
 | COCO-Caption | 16 | 8 | 56.94 | 60.05 | 54.11 | 49.87 | 55.2425 | 109.99 | 82.6163 |
+| COCO-Caption | 64 | 32 | 57.45 | 59.35 | 54.71 | 50.46 | 55.4925 | 107.84 | 81.6663 |
 
-The compact run summary is saved in
-`table1_rank32_rank16_xlora_metrics.json`. All four evaluations used GPUs
-`0,1,3,4,5,6,7`, avoiding the throttled GPU 2.
+The compact rank16/rank32 run summary is saved in
+`table1_rank32_rank16_xlora_metrics.json`. The COCO protocol correction and
+rank64 official-source re-evaluation are saved in
+`table1_coco_official_protocol_fix_20260514.json`. All four evaluations used
+GPUs `0,1,3,4,5,6,7`, avoiding the throttled GPU 2.
 
 ## Completed Ablations
 
@@ -133,7 +138,7 @@ a publishable method result because the target task is no longer preserved.
 |---|---|---|---|---|
 | M1 | Main IconQA target table | Reproduced baseline vs TFR-BS on IconQA + four source tasks | done | Full metrics already recorded. |
 | M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | done | Probe CIDEr=1.2138; this is not a COCO-target fine-tune. |
-| M3 | COCO-Caption downstream adaptation | Strict COCO-target LoRASculpt baseline, then matched COCO-target TFR-BS analogue | done | Baseline: CIDEr=1.1667, SourceAvg=37.1825. TFR-BS analogue: CIDEr=1.0784, SourceAvg=39.4375. |
+| M3 | COCO-Caption downstream adaptation | Strict COCO-target LoRASculpt baseline, then matched COCO-target TFR-BS analogue | done | Corrected official-source protocol: baseline CIDEr=1.1667, SourceAvg=54.3600; TFR-BS analogue CIDEr=1.0784, SourceAvg=55.4925. |
 | M4 | Rank scaling | Compare total rank/residual capacity variants | done | M4a rank96/freeze32 full eval done: Avg=71.8388, above reproduced baseline but below A2a by 0.0538. |
 | T1 | Main Table 1 rank sweep | XLora total ranks 16 and 32 for IconQA and COCO-Caption targets | done | Rank32: IconQA Avg=71.7538, COCO table Avg=82.4613. Rank16: IconQA Avg=71.5388, COCO table Avg=82.6163. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | done | D1a LOAD_NON_LORA=False full eval done: SourceAvg=60.6150 but IconQA=80.11, confirming target connector state is necessary. |
@@ -160,13 +165,14 @@ a publishable method result because the target task is no longer preserved.
    loaded target non-lora/projector state as the main checkpoint.
 5. `S1` internal norm/delta analysis is now recorded; use it as method evidence
    before writing the method section.
-6. The strict COCO-target comparison is now complete. TFR-BS improves SourceAvg
-   from 37.1825 to 39.4375 but lowers CIDEr from 1.1667 to 1.0784, so the paper
-   should present it as a source-retention stress test, not as a target-metric
-   win.
+6. The strict COCO-target comparison is now complete under the official issue2
+   source protocol. TFR-BS improves SourceAvg from 54.3600 to 55.4925 but lowers
+   CIDEr from 1.1667 to 1.0784, so the paper should present it as a
+   source-retention stress test, not as a target-metric win.
 7. The Table 1 rank16/rank32 sweep is complete for the paper-facing `XLora`
-   name. Rank32 gives the stronger IconQA table average, while rank16 gives a
-   slightly stronger COCO table average in this run.
+   name, and the rank64 COCO source row has been corrected with official-source
+   re-evaluation. Rank32 gives the stronger IconQA table average, while rank16
+   gives the strongest COCO table average in this run.
 
 ## Logging Rules
 
