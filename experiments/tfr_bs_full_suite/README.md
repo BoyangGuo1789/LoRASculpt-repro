@@ -65,6 +65,26 @@ COCO caption target quality remains better with the original LoRASculpt
 fine-tune.
 
 
+
+## Table 1 Rank-16/32 Completion
+
+The baseline-style Table 1 rank sweep for `XLora` is now complete for total
+ranks 16 and 32. The IconQA target rows use `Avg=(SourceAvg+IconQA)/2`. The COCO
+rows report CIDEr in the ledger and CIDEr x100 in the paper table; the table
+average follows the LoRASculpt formatting convention, while `results.csv` keeps
+COCO `Avg` blank because CIDEr and VQA accuracy are on different scales.
+
+| Target | Rank | Frozen target rank | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Target | Table Avg |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| IconQA | 32 | 16 | 59.84 | 59.20 | 55.65 | 53.10 | 56.9475 | 86.56 | 71.7538 |
+| IconQA | 16 | 8 | 59.14 | 58.75 | 55.88 | 51.82 | 56.3975 | 86.68 | 71.5388 |
+| COCO-Caption | 32 | 16 | 57.44 | 60.55 | 54.07 | 50.23 | 55.5725 | 109.35 | 82.4613 |
+| COCO-Caption | 16 | 8 | 56.94 | 60.05 | 54.11 | 49.87 | 55.2425 | 109.99 | 82.6163 |
+
+The compact run summary is saved in
+`table1_rank32_rank16_xlora_metrics.json`. All four evaluations used GPUs
+`0,1,3,4,5,6,7`, avoiding the throttled GPU 2.
+
 ## Completed Ablations
 
 | ID | Change | IconQA | OKVQA | OCRVQA | GQA | TextVQA | SourceAvg | Avg | Verdict |
@@ -115,6 +135,7 @@ a publishable method result because the target task is no longer preserved.
 | M2 | COCO-Caption target table | COCO-Caption evaluation/probe for current IconQA-target TFR-BS | done | Probe CIDEr=1.2138; this is not a COCO-target fine-tune. |
 | M3 | COCO-Caption downstream adaptation | Strict COCO-target LoRASculpt baseline, then matched COCO-target TFR-BS analogue | done | Baseline: CIDEr=1.1667, SourceAvg=37.1825. TFR-BS analogue: CIDEr=1.0784, SourceAvg=39.4375. |
 | M4 | Rank scaling | Compare total rank/residual capacity variants | done | M4a rank96/freeze32 full eval done: Avg=71.8388, above reproduced baseline but below A2a by 0.0538. |
+| T1 | Main Table 1 rank sweep | XLora total ranks 16 and 32 for IconQA and COCO-Caption targets | done | Rank32: IconQA Avg=71.7538, COCO table Avg=82.4613. Rank16: IconQA Avg=71.5388, COCO table Avg=82.6163. |
 | D1 | Connector diagnostic | Check whether projector/non-LoRA trainables are necessary for TFR-BS | done | D1a LOAD_NON_LORA=False full eval done: SourceAvg=60.6150 but IconQA=80.11, confirming target connector state is necessary. |
 | A1 | Component ablation | baseline target only, OKVQA-only residual, OKVQA+COCO residual | partial | Baseline and OKVQA-only are done; main TFR-BS is done. |
 | A2 | Target preservation ablation | remove or weaken target KL | done | A2a target_kl=0 full eval is the current best: Avg=71.8925. |
@@ -143,6 +164,9 @@ a publishable method result because the target task is no longer preserved.
    from 37.1825 to 39.4375 but lowers CIDEr from 1.1667 to 1.0784, so the paper
    should present it as a source-retention stress test, not as a target-metric
    win.
+7. The Table 1 rank16/rank32 sweep is complete for the paper-facing `XLora`
+   name. Rank32 gives the stronger IconQA table average, while rank16 gives a
+   slightly stronger COCO table average in this run.
 
 ## Logging Rules
 

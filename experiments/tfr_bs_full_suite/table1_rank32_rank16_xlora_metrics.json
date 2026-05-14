@@ -1,0 +1,114 @@
+{
+  "date": "2026-05-14",
+  "driver_log": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/xlora_rank32_rank16_table1_eval_driver_20260514_212713.log",
+  "runs": {
+    "coco_rank16_freeze8": {
+      "cider": 1.0999,
+      "source_eval": {
+        "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-xlora-coco-ok3k-r16-fr8-tkl0-full-no2-20260514_181918",
+        "git_commit": "5762787bb927b7962fb4f8e5438bb328b5e9937e",
+        "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/xlora_coco_r16_fr8_source_eval_20260514_212713.log",
+        "metrics": {
+          "Avg": null,
+          "GQA": 54.11,
+          "IconQA": null,
+          "OCRVQA": 60.05,
+          "OKVQA": 56.94,
+          "SourceAvg": 55.2425,
+          "TextVQA": 49.87
+        },
+        "promote_to_full_eval": false,
+        "required_gqa_for_target": null,
+        "run_name": "xlora_coco_r16_fr8_source_table1_20260514",
+        "target_avg": 71.05375,
+        "tasks_completed": [
+          "okvqa",
+          "ocrvqa",
+          "gqa",
+          "textvqa"
+        ]
+      },
+      "table_avg": 82.61625000000001,
+      "table_target": 109.99000000000001
+    },
+    "coco_rank32_freeze16": {
+      "cider": 1.0935,
+      "source_eval": {
+        "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-xlora-coco-ok3k-r32-fr16-tkl0-full-no2-20260514_181918",
+        "git_commit": "5762787bb927b7962fb4f8e5438bb328b5e9937e",
+        "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/xlora_coco_r32_fr16_source_eval_20260514_212713.log",
+        "metrics": {
+          "Avg": null,
+          "GQA": 54.07,
+          "IconQA": null,
+          "OCRVQA": 60.55,
+          "OKVQA": 57.44,
+          "SourceAvg": 55.5725,
+          "TextVQA": 50.23
+        },
+        "promote_to_full_eval": false,
+        "required_gqa_for_target": null,
+        "run_name": "xlora_coco_r32_fr16_source_table1_20260514",
+        "target_avg": 71.05375,
+        "tasks_completed": [
+          "okvqa",
+          "ocrvqa",
+          "gqa",
+          "textvqa"
+        ]
+      },
+      "table_avg": 82.46124999999999,
+      "table_target": 109.35
+    },
+    "iconqa_rank16_freeze8": {
+      "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-xlora-iconqa-ok3k-coco3k-r16-fr8-tkl0-full-no2-20260514_181918",
+      "git_commit": "5762787bb927b7962fb4f8e5438bb328b5e9937e",
+      "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/xlora_iconqa_r16_fr8_eval_20260514_212713.log",
+      "metrics": {
+        "Avg": 71.53875000000001,
+        "GQA": 55.88,
+        "IconQA": 86.68,
+        "OCRVQA": 58.75,
+        "OKVQA": 59.14,
+        "SourceAvg": 56.3975,
+        "TextVQA": 51.82
+      },
+      "promote_to_full_eval": false,
+      "required_gqa_for_target": 51.999999999999936,
+      "run_name": "xlora_iconqa_r16_fr8_table1_20260514",
+      "target_avg": 71.05375,
+      "tasks_completed": [
+        "iconqa",
+        "okvqa",
+        "ocrvqa",
+        "gqa",
+        "textvqa"
+      ]
+    },
+    "iconqa_rank32_freeze16": {
+      "checkpoint": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/checkpoints/llava-v1.5-7b-xlora-iconqa-ok3k-coco3k-r32-fr16-tkl0-full-no2-20260514_181918",
+      "git_commit": "5762787bb927b7962fb4f8e5438bb328b5e9937e",
+      "log_file": "/data/guoboyang/LoRa-Projects/LoRASculpt-repro/logs/xlora_iconqa_r32_fr16_eval_20260514_212713.log",
+      "metrics": {
+        "Avg": 71.75375,
+        "GQA": 55.65,
+        "IconQA": 86.56,
+        "OCRVQA": 59.2,
+        "OKVQA": 59.84,
+        "SourceAvg": 56.9475,
+        "TextVQA": 53.1
+      },
+      "promote_to_full_eval": true,
+      "required_gqa_for_target": 50.04999999999993,
+      "run_name": "xlora_iconqa_r32_fr16_table1_20260514",
+      "target_avg": 71.05375,
+      "tasks_completed": [
+        "iconqa",
+        "okvqa",
+        "ocrvqa",
+        "gqa",
+        "textvqa"
+      ]
+    }
+  }
+}
